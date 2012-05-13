@@ -1,0 +1,13 @@
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\DataAccessLayer.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\DataAccessLayer.pdb
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\DataTransfer.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\NHibernate.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\Iesi.Collections.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\NHibernate.pdb
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\NHibernate.xml
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\Iesi.Collections.pdb
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\Iesi.Collections.xml
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\bin\Debug\DataTransfer.pdb
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\obj\Debug\ResolveAssemblyReference.cache
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\obj\Debug\DataAccessLayer.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataAccessLayer\obj\Debug\DataAccessLayer.pdb

@@ -1,0 +1,6 @@
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\bin\Debug\DataTransfer.dll.config
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\bin\Debug\DataTransfer.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\bin\Debug\DataTransfer.pdb
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\obj\Debug\ResolveAssemblyReference.cache
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\obj\Debug\DataTransfer.dll
+C:\MyStuff\WebDev\SummerOfNHibernate\SummerOfNHibernate\DataTransfer\obj\Debug\DataTransfer.pdb

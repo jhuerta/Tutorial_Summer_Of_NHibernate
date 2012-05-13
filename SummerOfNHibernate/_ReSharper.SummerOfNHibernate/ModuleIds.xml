@@ -1,0 +1,5 @@
+<Modules>
+  <Module PersistentId="561A08AA-44B5-46A9-BF14-65AD259875C4" ModuleId="DataTransfer" />
+  <Module PersistentId="3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B" ModuleId="DataAccessLayer" />
+  <Module PersistentId="FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1" ModuleId="DataAccessLayerTest" />
+</Modules>

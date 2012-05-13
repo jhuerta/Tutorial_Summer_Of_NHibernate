@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTransfer", "DataTransfer\DataTransfer.csproj", "{561A08AA-44B5-46A9-BF14-65AD259875C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayerTest", "DataAccessLayerTest\DataAccessLayerTest.csproj", "{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{561A08AA-44B5-46A9-BF14-65AD259875C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{561A08AA-44B5-46A9-BF14-65AD259875C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{561A08AA-44B5-46A9-BF14-65AD259875C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{561A08AA-44B5-46A9-BF14-65AD259875C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AAD3770-FBDF-4F79-B38D-8E3AFB009D8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
