@@ -14,9 +14,12 @@ namespace DataAccessLayerTest
         public void CanGetCustomerId()
         {
             // Comment
+
             var provider = new NHibernateDataProvider();
             var actual = provider.GetCustomerById(1).Id;
             Assert.AreEqual(1, actual);
+
+            // Comment
 
         }
     }
