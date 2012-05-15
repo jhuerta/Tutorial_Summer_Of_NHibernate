@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using DataTransfer;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Criterion;
 
 namespace DataAccessLayer
 {
     public class NHibernateDataProvider
     {
+        private readonly ISession _session;
+
+        public NHibernateDataProvider()
+        {
+            _session = GetSession();
+        }
 
         public Customer GetCustomerById(int customerId)
         {
-            var session = GetSession();
+            var _session = GetSession();
 
-            return session.Get<Customer>(customerId);
+            return _session.Get<Customer>(customerId);
         }
 
         private static ISession GetSession()
@@ -50,30 +57,27 @@ namespace DataAccessLayer
 
         public IList<Customer> GetCustomersByFirstname(string firstname)
         {
-            var session = GetSession();
 
             var queryString = string.Format("select c from Customer c where c.Firstname = '{0}'", firstname);
 
-            return session.CreateQuery(queryString).List<Customer>();
+            return _session.CreateQuery(queryString).List<Customer>();
 
         }
         
         public IList<Customer> GetCustomerByFirstnameWithParameters(string firstname)
         {
-            var session = GetSession();
 
             const string queryString = "select c from Customer c where c.Firstname=:name";
 
-            return session.CreateQuery(queryString).SetString("name",firstname).List<Customer>();
+            return _session.CreateQuery(queryString).SetString("name", firstname).List<Customer>();
         }
 
         public IList<Customer> GetCustomerByFirstnameAndLastname(string firstname, string lastname)
         {
-            var session = GetSession();
 
             const string queryString = "select c from Customer c where c.Firstname=:fName and c.Lastname=:lName";
 
-            return session.CreateQuery(queryString)
+            return _session.CreateQuery(queryString)
                 .SetString("fName", firstname)
                 .SetString("lName", lastname)
                 .List<Customer>();
@@ -81,11 +85,81 @@ namespace DataAccessLayer
 
         public IList<Customer> GetCustomersWithIdGreaterThan(int id)
         {
-            ISession session = GetSession();
 
             const string queryString = "select c from Customer c where c.Id > :id";
 
-            return session.CreateQuery(queryString).SetInt32("id", id).List<Customer>();
+            return _session.CreateQuery(queryString).SetInt32("id", id).List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetCustomerByFirstName(string firstname)
+        {
+
+            return _session.CreateCriteria(typeof(Customer))
+                .Add(Restrictions.Eq("Firstname", firstname))
+                .List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetCustomersByFirstNameAndLastName(string firstname, string lastname)
+        {
+
+            return _session.CreateCriteria(typeof(Customer))
+                .Add(Restrictions.Eq("Firstname", firstname))
+                .Add(Restrictions.Eq("Lastname",lastname))
+                .List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetCustomersWithIdGreaterThan(int id)
+        {
+
+            return _session.CreateCriteria(typeof(Customer))
+                .Add(Restrictions.Gt("Id", id))
+                .List<Customer>();
+        }
+
+        public IList<Customer> QueryByExample_GetCustomerByExample(Customer customerSample)
+        {
+
+            return _session.CreateCriteria(typeof(Customer))
+                .Add(Example.Create(customerSample))
+                .List<Customer>();
+        }
+
+        public IList<string> GetDistinctCustomerFirstNames()
+        {
+            const string queryString = "select distinct c.Firstname from Customer c";
+
+            return _session.CreateQuery(queryString).List<string>();
+        }
+
+        public IList<string> CriteriaAPI_GetDistinctCustomerFirstNames()
+        {
+
+
+            return _session.CreateCriteria(typeof (Customer))
+                .SetProjection(Projections.Distinct(Projections.Property("Firstname"))).List<string>();
+        }
+
+        public IList<Customer> GetCustomersOrderByLastname()
+        {
+            const string queryString = "select c from Customer c order by c.Lastname";
+
+            return _session.CreateQuery(queryString).List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetCustomersOrderByLastname()
+        { 
+            return _session.CreateCriteria(typeof (Customer))
+                .AddOrder(new Order("Lastname", true))
+                .List<Customer>();
+        }
+
+        public IList<object[]> GetCustomersFirstnameCount()
+        {
+            const string queryString = "select c.Firstname, count(c.Firstname) from Customer c group by c.Firstname";
+
+            var toReturn =  _session.CreateQuery(queryString).List<object[]>();
+            
+            return toReturn;
         }
     }
 }
