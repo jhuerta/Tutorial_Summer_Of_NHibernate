@@ -169,8 +169,6 @@ namespace DataAccessLayerTest
         [Test]
         public void QueryByExample_CanGetCustomerByPassingACustomer_v2()
         {
-            const int minimumNumerOfOccurances = 1;
-
             const string firstname = "Juan";
             const string lastname = "Huerta";
 
@@ -259,7 +257,7 @@ namespace DataAccessLayerTest
         {
             var expectedCounts = new Dictionary<string, int>
                                      {
-                                         {"Juan", 6},
+                                         {"Juan", 1},
                                          {"Eduard", 6},
                                          {"Santiago", 2},
                                          {"Irene", 1},
@@ -286,9 +284,9 @@ namespace DataAccessLayerTest
 
             foreach (var nameCount in firstNameCount)
             {
-                var firstValue = expectedCounts[nameCount[0].ToString()];
+                var firstValue = expectedCounts[nameCount.Firstname];
                 
-                var secondValue = Convert.ToInt32(nameCount[1]);
+                var secondValue = Convert.ToInt32(nameCount.Count);
 
                 Assert.AreEqual(firstValue, secondValue);
             }

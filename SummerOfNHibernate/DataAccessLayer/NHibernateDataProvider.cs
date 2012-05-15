@@ -153,11 +153,11 @@ namespace DataAccessLayer
                 .List<Customer>();
         }
 
-        public IList<object[]> GetCustomersFirstnameCount()
+        public IList<CustomerFirstnameCounter> GetCustomersFirstnameCount()
         {
-            const string queryString = "select c.Firstname, count(c.Firstname) from Customer c group by c.Firstname";
+            const string queryString = "select new CustomerFirstnameCounter(c.Firstname, count(c.Firstname)) from Customer c group by c.Firstname";
 
-            var toReturn =  _session.CreateQuery(queryString).List<object[]>();
+            var toReturn =  _session.CreateQuery(queryString).List<CustomerFirstnameCounter>();
             
             return toReturn;
         }
