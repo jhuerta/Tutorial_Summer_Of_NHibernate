@@ -161,5 +161,45 @@ namespace DataAccessLayer
             
             return toReturn;
         }
+
+        public int AddCustomer(Customer customer)
+        {
+            object id = _session.Save(customer);
+            _session.Flush();
+            return (int) id;
+
+        }
+
+        public void DeleteCustomer(Customer customer)
+        {
+             _session.Delete(customer);
+            _session.Flush();
+        }
+
+        public void UpdateCustomerFirstname(int customerId, string firstsname)
+        {
+            //var currentCustomer = GetCustomerById(customerId);
+            //currentCustomer.Firstname = firstsname;
+
+            //_session.Update(currentCustomer);
+            //_session.Flush();
+        }
+
+        public void UpdateCustomerLastname(int customerId, string lastname)
+        {
+            //var currentCustomer = GetCustomerById(customerId);
+            //currentCustomer.Lastname = lastname;
+
+            //_session.Update(currentCustomer);
+            //_session.Flush();
+        }
+
+        public void UpdateCustomer(Customer customer)
+        {
+            _session.Update(customer);
+            _session.Flush();
+        }
+
+
     }
 }

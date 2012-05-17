@@ -23,5 +23,28 @@
             get { return _id; }
             set { _id = value; }
         }
+
+        public virtual bool Equals(Customer other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other._firstname, _firstname) && Equals(other._lastname, _lastname);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (Customer)) return false;
+            return Equals((Customer) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((_firstname != null ? _firstname.GetHashCode() : 0)*397) ^ (_lastname != null ? _lastname.GetHashCode() : 0);
+            }
+        }
     }
 }
