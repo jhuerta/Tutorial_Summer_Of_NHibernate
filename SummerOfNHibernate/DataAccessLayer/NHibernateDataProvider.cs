@@ -17,9 +17,7 @@ namespace DataAccessLayer
         }
 
         public Customer GetCustomerById(int customerId)
-        {
-            var _session = GetSession();
-
+        {   
             return _session.Get<Customer>(customerId);
         }
 
@@ -136,7 +134,8 @@ namespace DataAccessLayer
 
 
             return _session.CreateCriteria(typeof (Customer))
-                .SetProjection(Projections.Distinct(Projections.Property("Firstname"))).List<string>();
+                .SetProjection(Projections.Distinct(Projections.Property("Firstname")))
+                .List<string>();
         }
 
         public IList<Customer> GetCustomersOrderByLastname()
@@ -178,20 +177,20 @@ namespace DataAccessLayer
 
         public void UpdateCustomerFirstname(int customerId, string firstsname)
         {
-            //var currentCustomer = GetCustomerById(customerId);
-            //currentCustomer.Firstname = firstsname;
+            var currentCustomer = GetCustomerById(customerId);
+            currentCustomer.Firstname = firstsname;
 
-            //_session.Update(currentCustomer);
-            //_session.Flush();
+            _session.Update(currentCustomer);
+            _session.Flush();
         }
 
         public void UpdateCustomerLastname(int customerId, string lastname)
         {
-            //var currentCustomer = GetCustomerById(customerId);
-            //currentCustomer.Lastname = lastname;
+            var currentCustomer = GetCustomerById(customerId);
+            currentCustomer.Lastname = lastname;
 
-            //_session.Update(currentCustomer);
-            //_session.Flush();
+            _session.Update(currentCustomer);
+            _session.Flush();
         }
 
         public void UpdateCustomer(Customer customer)

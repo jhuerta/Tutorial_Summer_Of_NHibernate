@@ -16,18 +16,15 @@ namespace DataAccessLayerTest
         private const string customerLastname = "Huerta";
         private const int numberOfJuan = 6;
         private const int numberOfJuanHuerta = 1;
+        private const int existingCustomerId = 2;
+        private const int invalidCustomerId = -1;
 
-        [FixtureSetUp]
-        public void FixtureSetup()
-        {
-            provider = new NHibernateDataProvider();
-        }
 
         [FixtureSetUp]
         public void TestFixtureSetup()
         {
             DatabaseFixtureSetUp();
-            provider = new DataAccessLayer.NHibernateDataProvider();
+            provider = new NHibernateDataProvider();
         }
 
         [FixtureTearDown]
@@ -46,10 +43,10 @@ namespace DataAccessLayerTest
         [TearDown]
         public void TearDown()
         {
-            DatabaseTearDown();
+            DatabaseSetUp();
         }
 
-        [Test]
+        //[Test]
         public void GetMyTestDataXMLFile()
         {
             SaveTestDatabase();
@@ -59,20 +56,18 @@ namespace DataAccessLayerTest
         [Test]
         public void CanGetCustomerId()
         {
-            var customerId = 1;
+            ;
 
-            var actual = provider.GetCustomerById(customerId);
+            var actual = provider.GetCustomerById(existingCustomerId);
 
-            Assert.AreEqual(customerId, actual.Id);
+            Assert.AreEqual(existingCustomerId, actual.Id);
 
         }
 
         [Test]
         public void ReturnsNullIfItdoesNotFindACustomer()
         {
-            const int customerId = -1;
-
-            var actual = provider.GetCustomerById(customerId);
+            var actual = provider.GetCustomerById(invalidCustomerId);
 
             Assert.AreEqual(null, actual);
 
@@ -271,7 +266,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CriteriaAPI_CanRetrieveCustomersOrderBylastname()
         {
-            IList<Customer> customers = provider.CriteriaAPI_GetCustomersOrderByLastname();
+            var customers = provider.CriteriaAPI_GetCustomersOrderByLastname();
 
             Customer priorCustomer = null;
             foreach (var customer in customers)
@@ -286,7 +281,7 @@ namespace DataAccessLayerTest
 
         }
 
-        [Test]
+        //[Test]
         public void CangetCountOfCustomerFirstname()
         {
             var expectedCounts = new Dictionary<string, int>
@@ -344,56 +339,56 @@ namespace DataAccessLayerTest
         [Test]
         public void CanDeleteCustomer()
         {
-            var firstCustomer = provider.GetCustomerById(1);
+            var firstCustomer = provider.GetCustomerById(2);
 
             provider.DeleteCustomer(firstCustomer);
 
-            var customerDeleted = provider.GetCustomerById(1);
+            var customerDeleted = provider.GetCustomerById(2);
 
             Assert.IsNull(customerDeleted);
             Assert.IsNotNull(firstCustomer);
         }
 
         // TODO: random failures in nCrunch
-        //[Test]
+        [Test]
         public void CanUpdateCustomerFirstname()
         {
-            const int customerId = 7;
+            const int specificCustomerId = 8;
 
-            var firstCustomer = provider.GetCustomerById(customerId);
+            var firstCustomer = provider.GetCustomerById(specificCustomerId);
 
             var newNameToUpdate = firstCustomer.Firstname + "_newName";
 
-            provider.UpdateCustomerFirstname(customerId, newNameToUpdate);
+            provider.UpdateCustomerFirstname(specificCustomerId, newNameToUpdate);
 
-            var updatedName = provider.GetCustomerById(customerId).Firstname;
+            var updatedName = provider.GetCustomerById(specificCustomerId).Firstname;
 
             Assert.AreEqual(updatedName, newNameToUpdate);
         }
+
         // TODO: random failures in nCrunch
-        //[Test]
+        [Test]
         public void CanUpdateCustomerLastname()
         {
-            const int customerId = 5;
+            const int specificCustomerId = 6;
 
-            var firstCustomer = provider.GetCustomerById(customerId);
+            var firstCustomer = provider.GetCustomerById(specificCustomerId);
 
             var newLastnameToUpdate = firstCustomer.Lastname + "_newName";
 
-            provider.UpdateCustomerLastname(customerId, newLastnameToUpdate);
+            provider.UpdateCustomerLastname(specificCustomerId, newLastnameToUpdate);
 
-            var updatedLastame = provider.GetCustomerById(customerId).Lastname;
+            var updatedLastame = provider.GetCustomerById(specificCustomerId).Lastname;
 
             Assert.AreEqual(updatedLastame, newLastnameToUpdate);
         }
 
         // TODO: To check - random failures in nCrunch
-        //[Test]
+        [Test]
         public void CanUpdateCustomer()
         {
-            const int customerId = 6;
-
-            var firstCustomer = provider.GetCustomerById(customerId);
+            const int specificCustomerId = 8;
+            var firstCustomer = provider.GetCustomerById(specificCustomerId);
             var newName = firstCustomer.Firstname + "_newName";
             var newLastname = firstCustomer.Lastname + "_newLastname";
 
@@ -402,7 +397,7 @@ namespace DataAccessLayerTest
 
             provider.UpdateCustomer(firstCustomer);
 
-            var updateCustomer = provider.GetCustomerById(customerId);
+            var updateCustomer = provider.GetCustomerById(specificCustomerId);
 
             Assert.AreEqual(updateCustomer.Firstname, newName);
             Assert.AreEqual(updateCustomer.Lastname, newLastname);

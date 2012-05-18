@@ -54,9 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataTransfer\DataTransfer.csproj">
+    <ProjectReference Include="..\DataTransfer\DataTransferObject.csproj">
       <Project>{561A08AA-44B5-46A9-BF14-65AD259875C4}</Project>
-      <Name>DataTransfer</Name>
+      <Name>DataTransferObject</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
