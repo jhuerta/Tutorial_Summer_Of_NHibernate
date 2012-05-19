@@ -7,6 +7,8 @@
       <generator class="native"></generator>
     </id>
     <!-- Not required to specify column if it matches the property name -->
+    <!-- DEFAULT Values for version: column="Version" type="integer" unsaved-value="0"-->
+    <version name="Version" />
     <property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
     <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>
   </class>  

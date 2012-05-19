@@ -9,28 +9,51 @@ namespace DataAccessLayer
 {
     public class NHibernateDataProvider
     {
-        private readonly ISession _session;
+        private readonly ISessionFactory _sessionFactory;
 
         public NHibernateDataProvider()
         {
-            _session = GetSession();
+            _sessionFactory = GetSessionFactory();
+        }
+
+        public NHibernateDataProvider(ISessionFactory sessionFactory)
+        {
+            _sessionFactory = sessionFactory;
         }
 
         public Customer GetCustomerById(int customerId)
-        {   
-            return _session.Get<Customer>(customerId);
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customer = session.Get<Customer>(customerId);
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
-        private static ISession GetSession()
+        private ISession GetSession()
+        {
+            return _sessionFactory.OpenSession();
+        }
+
+        private static ISessionFactory GetSessionFactory()
         {
             var configuration = new Configuration();
 
             configuration.Configure("hibernate.cfg.xml");
 
-            var sessionFactory = configuration.BuildSessionFactory();
-
-            var session = sessionFactory.OpenSession();
-            return session;
+            return configuration.BuildSessionFactory();
         }
 
         /*public Customer GetCustomerById(int customerId)
@@ -55,150 +78,474 @@ namespace DataAccessLayer
 
         public IList<Customer> GetCustomersByFirstname(string firstname)
         {
-
-            var queryString = string.Format("select c from Customer c where c.Firstname = '{0}'", firstname);
-
-            return _session.CreateQuery(queryString).List<Customer>();
-
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var queryString = string.Format("select c from Customer c where c.Firstname = '{0}'", firstname);
+                        var customers = session.CreateQuery(queryString).List<Customer>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
         
         public IList<Customer> GetCustomerByFirstnameWithParameters(string firstname)
         {
-
-            const string queryString = "select c from Customer c where c.Firstname=:name";
-
-            return _session.CreateQuery(queryString).SetString("name", firstname).List<Customer>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select c from Customer c where c.Firstname=:name";
+                        var customer = session.CreateQuery(queryString).SetString("name", firstname).List<Customer>();
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> GetCustomerByFirstnameAndLastname(string firstname, string lastname)
         {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select c from Customer c where c.Firstname=:fName and c.Lastname=:lName";
 
-            const string queryString = "select c from Customer c where c.Firstname=:fName and c.Lastname=:lName";
-
-            return _session.CreateQuery(queryString)
-                .SetString("fName", firstname)
-                .SetString("lName", lastname)
-                .List<Customer>();
+                        var customer = session.CreateQuery(queryString).SetString("fName", firstname).SetString("lName", lastname).List<Customer>();
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> GetCustomersWithIdGreaterThan(int id)
         {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select c from Customer c where c.Id > :id";
 
-            const string queryString = "select c from Customer c where c.Id > :id";
-
-            return _session.CreateQuery(queryString).SetInt32("id", id).List<Customer>();
+                        var customers = session.CreateQuery(queryString).SetInt32("id", id).List<Customer>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
         }
 
         public IList<Customer> CriteriaAPI_GetCustomerByFirstName(string firstname)
         {
-
-            return _session.CreateCriteria(typeof(Customer))
-                .Add(Restrictions.Eq("Firstname", firstname))
-                .List<Customer>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customer = session.CreateCriteria(typeof (Customer)).Add(Restrictions.Eq("Firstname", firstname)).List<Customer>();
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> CriteriaAPI_GetCustomersByFirstNameAndLastName(string firstname, string lastname)
         {
-
-            return _session.CreateCriteria(typeof(Customer))
-                .Add(Restrictions.Eq("Firstname", firstname))
-                .Add(Restrictions.Eq("Lastname",lastname))
-                .List<Customer>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customers = session.CreateCriteria(typeof (Customer)).Add(Restrictions.Eq("Firstname", firstname)).Add(Restrictions.Eq("Lastname", lastname)).List<Customer>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> CriteriaAPI_GetCustomersWithIdGreaterThan(int id)
         {
-
-            return _session.CreateCriteria(typeof(Customer))
-                .Add(Restrictions.Gt("Id", id))
-                .List<Customer>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customers = session.CreateCriteria(typeof (Customer)).Add(Restrictions.Gt("Id", id)).List<Customer>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> QueryByExample_GetCustomerByExample(Customer customerSample)
         {
-
-            return _session.CreateCriteria(typeof(Customer))
-                .Add(Example.Create(customerSample))
-                .List<Customer>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customer = session.CreateCriteria(typeof (Customer)).Add(Example.Create(customerSample)).List<Customer>();
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<string> GetDistinctCustomerFirstNames()
         {
-            const string queryString = "select distinct c.Firstname from Customer c";
-
-            return _session.CreateQuery(queryString).List<string>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select distinct c.Firstname from Customer c";
+                        var customerFirstNames = session.CreateQuery(queryString)
+                            .List<string>();
+                        transaction.Commit();
+                        return customerFirstNames;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<string> CriteriaAPI_GetDistinctCustomerFirstNames()
         {
-
-
-            return _session.CreateCriteria(typeof (Customer))
-                .SetProjection(Projections.Distinct(Projections.Property("Firstname")))
-                .List<string>();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customers = session.CreateCriteria(typeof (Customer)).SetProjection(Projections.Distinct(Projections.Property("Firstname"))).List<string>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> GetCustomersOrderByLastname()
         {
-            const string queryString = "select c from Customer c order by c.Lastname";
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select c from Customer c order by c.Lastname";
 
-            return _session.CreateQuery(queryString).List<Customer>();
+                        var customer = session.CreateQuery(queryString)
+                            .List<Customer>();
+                        transaction.Commit();
+                        return customer;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<Customer> CriteriaAPI_GetCustomersOrderByLastname()
-        { 
-            return _session.CreateCriteria(typeof (Customer))
-                .AddOrder(new Order("Lastname", true))
-                .List<Customer>();
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customers = session.CreateCriteria(typeof (Customer))
+                            .AddOrder(new Order("Lastname", true))
+                            .List<Customer>();
+                        transaction.Commit();
+                        return customers;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public IList<CustomerFirstnameCounter> GetCustomersFirstnameCount()
         {
-            const string queryString = "select new CustomerFirstnameCounter(c.Firstname, count(c.Firstname)) from Customer c group by c.Firstname";
-
-            var toReturn =  _session.CreateQuery(queryString).List<CustomerFirstnameCounter>();
-            
-            return toReturn;
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        const string queryString = "select new CustomerFirstnameCounter(c.Firstname, count(c.Firstname)) from Customer c group by c.Firstname";
+                        var toReturn = session.CreateQuery(queryString).List<CustomerFirstnameCounter>();
+                        transaction.Commit();
+                        return toReturn;
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public int AddCustomer(Customer customer)
         {
-            object id = _session.Save(customer);
-            _session.Flush();
-            return (int) id;
-
+            using (var session = GetSession())
+            {
+                using (var trasaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var id = session.Save(customer);
+                        session.Flush();
+                        trasaction.Commit();
+                        return (int)id;
+                    }
+                    catch(HibernateException)
+                    {
+                        trasaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public void DeleteCustomer(Customer customer)
         {
-             _session.Delete(customer);
-            _session.Flush();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        session.Delete(customer);
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+
+
+        public void DeleteCustomerWithTransactionCanRollBack(Customer undeletableCustomer, Customer deletableCustomer)
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        session.Delete(deletableCustomer);
+                        session.Flush();
+
+                        session.Delete(undeletableCustomer);
+                        session.Flush();
+
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public void DeleteCustomerWithTransaction(Customer customer)
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        session.Delete(customer);
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public void UpdateCustomerFirstname(int customerId, string firstsname)
         {
-            var currentCustomer = GetCustomerById(customerId);
-            currentCustomer.Firstname = firstsname;
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var currentCustomer = GetCustomerById(customerId);
+                        currentCustomer.Firstname = firstsname;
 
-            _session.Update(currentCustomer);
-            _session.Flush();
+                        session.Update(currentCustomer);
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public void UpdateCustomerLastname(int customerId, string lastname)
         {
-            var currentCustomer = GetCustomerById(customerId);
-            currentCustomer.Lastname = lastname;
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var currentCustomer = GetCustomerById(customerId);
+                        currentCustomer.Lastname = lastname;
 
-            _session.Update(currentCustomer);
-            _session.Flush();
+                        session.Update(currentCustomer);
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
         public void UpdateCustomer(Customer customer)
         {
-            _session.Update(customer);
-            _session.Flush();
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        session.Update(customer);
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
 
-
+        public void SaveOrUpdateCustomers(IList<Customer> customers)
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (var customer in customers)
+                        {
+                            session.SaveOrUpdate(customer);
+                        }
+                        session.Flush();
+                        transaction.Commit();
+                    }
+                    catch (HibernateException)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
     }
 }

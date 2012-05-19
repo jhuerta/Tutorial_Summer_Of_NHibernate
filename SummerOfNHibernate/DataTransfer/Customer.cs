@@ -5,6 +5,7 @@
         private string _firstname;
         private string _lastname;
         private int _id;
+        private int _version;
 
         public virtual string Firstname
         {
@@ -22,6 +23,12 @@
         {
             get { return _id; }
             set { _id = value; }
+        }
+
+        public virtual int Version
+        {
+            get { return _version; }
+            set { _version = value; }
         }
 
         public virtual bool Equals(Customer other)
