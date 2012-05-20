@@ -1,4 +1,7 @@
-﻿namespace DataTransfer
+﻿using System.Collections.Generic;
+using Iesi.Collections.Generic;
+
+namespace DataTransfer
 {
     public class Customer
     {
@@ -6,7 +9,8 @@
         private string _lastname;
         private int _id;
         private int _version;
-
+        private ISet<Order> orders;
+        
         public virtual string Firstname
         {
             get { return _firstname; }
@@ -29,6 +33,12 @@
         {
             get { return _version; }
             set { _version = value; }
+        }
+
+        public virtual ISet<Order> Orders
+        {
+            get { return orders; }
+            set { orders = value; }
         }
 
         public virtual bool Equals(Customer other)

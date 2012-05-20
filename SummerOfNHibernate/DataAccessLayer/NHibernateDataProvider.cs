@@ -21,6 +21,11 @@ namespace DataAccessLayer
             _sessionFactory = sessionFactory;
         }
 
+        public Customer GetCustomerByIdNoUsingsession(int customerId)
+        {
+            return GetSession().Get<Customer>(customerId);
+        }
+
         public Customer GetCustomerById(int customerId)
         {
             using (var session = GetSession())
@@ -328,7 +333,7 @@ namespace DataAccessLayer
                     try
                     {
                         var customers = session.CreateCriteria(typeof (Customer))
-                            .AddOrder(new Order("Lastname", true))
+                            .AddOrder(new NHibernate.Criterion.Order("Lastname", true))
                             .List<Customer>();
                         transaction.Commit();
                         return customers;
@@ -524,6 +529,26 @@ namespace DataAccessLayer
             }
         }
 
+        public Customer GetCustomerAndOrdersByCustomerId(int customerId)
+        {
+            using (var session = GetSession())
+            {
+                using (var transaction = session.BeginTransaction())
+                {
+                    try
+                    {
+                        var customer = session.Get<Customer>(customerId);
+                        NHibernateUtil.Initialize(customer.Orders);
+                        return customer;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
         public void SaveOrUpdateCustomers(IList<Customer> customers)
         {
             using (var session = GetSession())

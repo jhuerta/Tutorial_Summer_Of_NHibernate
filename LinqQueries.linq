@@ -14,9 +14,11 @@ insert into customer
 INSERT INTO customer (Firstname,Lastname)
 VALUES ('Juan', 'Huerta');
 
-select * from customer
-select * from [order]
+select * from customer where customerid = 3
+select * from [order] where customer = 3
 delete from customer where Customerid = 2
+
+
 
 
 
@@ -82,3 +84,9 @@ INSERT INTO [Order] (OrderDate,Customer) VALUES ('4/10/1976', 2);
 INSERT INTO [Order] (OrderDate,Customer) VALUES ('3/20/1976', 2);
 INSERT INTO [Order] (OrderDate,Customer) VALUES ('2/20/1976', 2);
 INSERT INTO [Order] (OrderDate,Customer) VALUES ('1/29/1976', 2);
+
+select * from customer
+
+
+mpList.GroupBy(employees => new String(employees.FName[0], 1))
+Customers.GroupBy(s => s.Firstname).Select(s => new {Value = s.Count(), Key = s.Key}).OrderBy(s => s.Value)

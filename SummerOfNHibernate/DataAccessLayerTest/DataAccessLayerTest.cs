@@ -354,6 +354,47 @@ namespace DataAccessLayerTest
         }
 
         [Test]
+        public void CanGetCustomerById()
+        {
+            var customer = provider.GetCustomerById(customerIdWithOrders);
+
+            Assert.IsNotNull(customer);
+
+            // You can see that here you can NOT browse nor inspect the orders in the customer
+            // The session has been deleted (because of the USING  statement)
+
+            Assert.That(customer.Id, Is.EqualTo(customerIdWithOrders));
+
+            // If lazy loading is ON, then as soon as the session is deleted (because of "using session"
+            // then we wont be able to access the orders.
+            Assert.Throws<LazyInitializationException>(delegate
+                                                           {
+                                                               var numberOfOrders = customer.Orders.Count;
+                                                           });
+        }
+
+        [Test]
+        public void CanGetCustomerByIdNoUsingUsingSession()
+        {
+            var customer = provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
+
+            // You can see that here you can browse and inspect the orders in the customer
+            // The session is still active
+            Assert.GreaterThan(customer.Orders.Count, 0);
+            Assert.IsNotNull(customer);
+            Assert.That(customer.Id, Is.EqualTo(customerIdWithOrders));
+        }
+
+        [Test]
+        public void CanGetCustomerAndOrdersByCustomerIdEvenIsNoLazyLoadingAndSessionIsDeleted()
+        {
+            var customer = provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
+            Assert.GreaterThan(customer.Orders.Count, 0);
+            Assert.IsNotNull(customer);
+            Assert.That(customer.Id, Is.EqualTo(customerIdWithOrders));
+        }
+
+        [Test]
         public void CanUpdateCustomerFirstname()
         {
             const int specificCustomerId = 8;
@@ -469,7 +510,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetCustomersByFirstname("anyFirstName");
@@ -496,12 +536,10 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetCustomerByFirstnameWithParameters("anyFirstName");
             });
-
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -512,21 +550,37 @@ namespace DataAccessLayerTest
         public void UpdateCustomer_RollsBack_WhenHibernateExceptionIsThrown()
         {
             // Arrange
-
             var mockTransaction = new MockTransaction();
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              mockProvider.UpdateCustomer(anyCustomer);
                                          });
 
-
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
         }
+
+
+        [Test]
+        public void AddCustomer_RollsBack_WhenHibernateExceptionIsThrown()
+        {
+            // Arrange
+            var mockTransaction = new MockTransaction();
+            var mockProvider = GetMockProvider(mockTransaction);
+
+            // Act
+            Assert.Throws<Exception>(delegate
+            {
+                mockProvider.AddCustomer(anyCustomer);
+            });
+
+            // Assert
+            Assert.That(mockTransaction.WasRolledBack, Is.True());
+        } 
+        
 
         [Test]
         public void UpdateCustomerLastname_RollsBack_WhenHibernateExceptionIsThrown()
@@ -536,12 +590,27 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              mockProvider.UpdateCustomerLastname(anyCustomerid, anyCustomerLastName);
                                          });
 
+            // Assert
+            Assert.That(mockTransaction.WasRolledBack, Is.True());
+        } 
+        
+        [Test]
+        public void DeleteCustomerWithTransactionCanRollBack_RollsBack_WhenHibernateExceptionIsThrown()
+        {
+            // Arrange
+            var mockTransaction = new MockTransaction();
+            var mockProvider = GetMockProvider(mockTransaction);
+
+            // Act
+            Assert.Throws<Exception>(delegate
+                                         {
+                                             mockProvider.DeleteCustomerWithTransactionCanRollBack(anyCustomer, anyCustomer);
+                                         });
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -555,16 +624,15 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.UpdateCustomerFirstname(anyCustomerid, anyCustomerLastName);
             });
 
-
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
         }
+        
 
         [Test]
         public void DeleteCustomerWithTransaction_RollsBack_WhenHibernateExceptionIsThrown()
@@ -574,31 +642,10 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              mockProvider.DeleteCustomerWithTransaction(anyCustomer);
                                          });
-
-
-            // Assert
-            Assert.That(mockTransaction.WasRolledBack, Is.True());
-        }
-
-        [Test]
-        public void DeleteCustomerWithTransactionCanRollBack_RollsBack_WhenHibernateExceptionIsThrown()
-        {
-            // Arrange
-            var mockTransaction = new MockTransaction();
-            var mockProvider = GetMockProvider(mockTransaction);
-
-            // Act
-
-            Assert.Throws<Exception>(delegate
-                                         {
-                                             mockProvider.DeleteCustomerWithTransactionCanRollBack(anyCustomer, anyCustomer);
-                                         });
-
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -612,12 +659,10 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              mockProvider.GetCustomerByFirstnameAndLastname("anyname", "anylastname");
                                          });
-
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -631,13 +676,11 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              const int anyId = 1;
                                              mockProvider.GetCustomersWithIdGreaterThan(anyId);
                                          });
-
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -651,12 +694,10 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
                                          {
                                              mockProvider.CriteriaAPI_GetCustomerByFirstName(anyName);
                                          });
-
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
@@ -670,7 +711,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.CriteriaAPI_GetCustomersByFirstNameAndLastName(anyName,anyCustomerLastName);
@@ -688,7 +728,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 const int anyId = 1;
@@ -707,7 +746,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.QueryByExample_GetCustomerByExample(anyCustomer);
@@ -725,7 +763,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetDistinctCustomerFirstNames();
@@ -743,7 +780,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.CriteriaAPI_GetDistinctCustomerFirstNames();
@@ -761,7 +797,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetCustomersOrderByLastname();
@@ -779,7 +814,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.CriteriaAPI_GetCustomersOrderByLastname();
@@ -797,7 +831,6 @@ namespace DataAccessLayerTest
             var mockProvider = GetMockProvider(mockTransaction);
 
             // Act
-
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetCustomersFirstnameCount();
@@ -903,7 +936,7 @@ namespace DataAccessLayerTest
 
             const int zeroAsAResultOfNotBeingExecuted = 0;
 
-            Assert.That(HibernateException_was_thrown,Is.True());
+            Assert.That(HibernateException_was_thrown, Is.True());
             Assert.That(numberOfJuansAfterUpdatingAndSaving, Is.EqualTo(zeroAsAResultOfNotBeingExecuted));
         }
 
