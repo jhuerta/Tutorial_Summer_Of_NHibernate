@@ -50,6 +50,7 @@ namespace DataAccessLayer
 
         private Customer GetCustomerByIdWithinOpenedTransaction(int customerId)
         {
+
             var customer = _session.Get<Customer>(customerId);
             return customer;
         }
