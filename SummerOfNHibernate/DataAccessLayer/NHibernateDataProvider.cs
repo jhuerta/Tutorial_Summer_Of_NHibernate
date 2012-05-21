@@ -32,19 +32,26 @@ namespace DataAccessLayer
 
         public Customer GetCustomerById(int customerId)
         {
-            return _session.Get<Customer>(customerId);
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    var customer = _session.Get<Customer>(customerId);
+                    transaction.Commit();
+                    return customer;
+                }
+                catch (HibernateException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
 
-            /*
-             * THIS CANNOT BE USED ANYMORE. THE SESSION IS SHARED! BEGINNING/CLOSING A TRANSACTION 
-             * WILL AFFECT OTHER OPERATIONS!
-            using (var transaction = _session.BeginTransaction()) {
-                try {
-                    BLAH BLAH BLAH
-                }
-                catch (HibernateException) {
-                    BLAH BLAH BLAH
-                }
-            }*/
+        private Customer GetCustomerByIdWithinOpenedTransaction(int customerId)
+        {
+            var customer = _session.Get<Customer>(customerId);
+            return customer;
         }
 
         /*public Customer GetCustomerById(int customerId)
@@ -447,7 +454,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var currentCustomer = GetCustomerById(customerId);
+                    var currentCustomer = GetCustomerByIdWithinOpenedTransaction(customerId);
                     currentCustomer.Firstname = firstsname;
 
                     _session.Update(currentCustomer);
@@ -468,7 +475,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var currentCustomer = GetCustomerById(customerId);
+                    var currentCustomer = GetCustomerByIdWithinOpenedTransaction(customerId);
                     currentCustomer.Lastname = lastname;
 
                     _session.Update(currentCustomer);
