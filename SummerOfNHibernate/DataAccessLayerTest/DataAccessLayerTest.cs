@@ -24,7 +24,7 @@ namespace DataAccessLayerTest
         private const int existingCustomerId = 2;
         private const int invalidCustomerId = -1;
         private const int customerIdWithOrders = 2;
-        private const int deletableCustomerId = 3;
+        private const int deletableCustomerId = 10;
         private readonly Customer anyCustomer = new Customer();
         private const string notValidLastname = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         private const string anyName = "anyName";
@@ -399,6 +399,7 @@ namespace DataAccessLayerTest
                                                            });
              */
 
+            // The session is not destroyed, as such we can retrieve the orders.
             Assert.That(customer.Orders.Count, Is.GreaterThan(0));
         }
 
@@ -1102,6 +1103,66 @@ namespace DataAccessLayerTest
         {
             _session = _sessionManager.GetSession();
             _provider.Session = _session;
+        }
+
+        [Test]
+        public void CanGetDistinctCustomersWithOrdersSince()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.GetDistinctCustomersWithOrdersSince(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Assering we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count( c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CriteriaAPI_CanGetDistinctCustomersWithOrdersSince()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.CriteriaAPI_GetDistinctCustomersWithOrdersSince(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Asserting we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count(c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CriteriaAPI_GetDistinctCustomersWithOrdersSinceWithProjects()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.CriteriaAPI_GetDistinctCustomersWithOrdersSinceWithProjects(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Assering we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count(c => c == customer));
+            }
         }
     }
 }

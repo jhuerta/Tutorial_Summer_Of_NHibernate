@@ -5,6 +5,7 @@ using DataTransfer;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Criterion;
+using NHibernate.SqlCommand;
 using Order = DataTransfer.Order;
 
 namespace DataAccessLayer
@@ -547,5 +548,44 @@ namespace DataAccessLayer
                 }
             }
         }
+        
+        public IList<Customer> GetDistinctCustomersWithOrdersSince(DateTime orderDate)
+        {
+            return _session.CreateQuery("select distinct c from Customer c, elements(c.Orders) as o where o.OrderDate > :orderDate").
+                SetDateTime("orderDate", orderDate).List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetDistinctCustomersWithOrdersSince(DateTime orderDate)
+        {
+            // The distinct is done in software, no by query! And is done in this server
+            return
+                _session.CreateCriteria(typeof(Customer))
+                    .CreateCriteria("Orders")
+                    .Add(Expression.Gt("OrderDate", orderDate))
+                    .SetResultTransformer(new NHibernate.Transform.DistinctRootEntityResultTransformer())
+                    .List<Customer>();
+        }
+
+        public IList<Customer> CriteriaAPI_GetDistinctCustomersWithOrdersSinceWithProjects(DateTime orderDate)
+        {
+            // The projection is forcing to do the query in the database, in the SQL server
+            var ids = _session.CreateCriteria(typeof(Customer))
+                .SetProjection(
+                    Projections.Distinct(
+                        Projections.ProjectionList()
+                        .Add(Projections.Property("Id")))
+                        )
+                        .CreateCriteria("Orders")
+                        .Add(Expression.Gt("OrderDate", orderDate))
+                        .SetResultTransformer(new NHibernate.Transform.DistinctRootEntityResultTransformer())
+                        .List<int>();
+            return
+                _session.CreateCriteria(typeof (Customer))
+                .Add(Expression.In("Id", ids.ToList()))
+                .List<Customer>();
+        }
+
     }
+
+
 }
