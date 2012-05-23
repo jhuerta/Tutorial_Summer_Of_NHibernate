@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer">
+	<class name="DataTransfer.Product, DataTransfer" table="Product">
+		<id name="Id" column="ProductId" type="Int32" unsaved-value="0">
+			<generator class="native"/>
+		</id>
+		<property name="Name" column="Name" type="string" not-null="true" length="50" />
+		<property name="Cost" column="Cost" type="float" not-null="true" />
+
+		<bag name="Orders" generic="true" table="OrderProduct" inverse="true">
+			<key column="Product" />
+			<many-to-many column="`Order`" class="DataTransfer.Order,DataTransfer" />
+		</bag>
+	</class>
+</hibernate-mapping>

@@ -70,7 +70,6 @@ namespace DataAccessLayerTest
             SaveTestDatabase();
         }
 
-
         [Test]
         public void CanGetCustomerId()
         {
@@ -1162,6 +1161,21 @@ namespace DataAccessLayerTest
             {
                 // Assering we have unique (single) customers
                 Assert.AreEqual(1, customersOrderSince.Count(c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CanGetCustomersWithOrdersThatContainAnSpecificProductID()
+        {
+            const int productId = 3;
+            var customers = _provider.GetCustomersWithORdersHavingProduct(productId).Distinct();
+            foreach (var customer in customers)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    var orderContainsProductId = order.Products.Select(s => s.Id).Contains(productId);
+                    Assert.That(orderContainsProductId, Is.True());
+                }
             }
         }
     }

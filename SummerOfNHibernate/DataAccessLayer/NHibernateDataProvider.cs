@@ -585,6 +585,29 @@ namespace DataAccessLayer
                 .List<Customer>();
         }
 
+        public IList<Customer> GetCustomersWithORdersHavingProduct(int productId)
+        {
+
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    var customers = _session.CreateCriteria(typeof (Customer))
+                        .CreateCriteria("Orders")
+                        .CreateCriteria("Products")
+                        .Add(Expression.Eq("Id", productId)).List<Customer>();
+                    //_session.Flush();
+                    //transaction.Commit();
+                    return customers;
+                }
+                catch (HibernateException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
     }
 
 
