@@ -13,7 +13,10 @@ namespace DataAccessLayerTest
     [TestFixture]
     public class DataAccessLayerTests : Microdesk.Utility.UnitTest.DatabaseUnitTestBase
     {
-        private NHibernateDataProvider provider;
+        private NHibernateDataProvider _provider;
+        private NHibernateSessionManager _sessionManager;
+        private ISession _session;
+
         private const string customerFirstname = "Juan";
         private const string customerLastname = "Huerta";
         private const int numberOfJuan = 11;
@@ -21,7 +24,7 @@ namespace DataAccessLayerTest
         private const int existingCustomerId = 2;
         private const int invalidCustomerId = -1;
         private const int customerIdWithOrders = 2;
-        private const int deletableCustomerId = 3;
+        private const int deletableCustomerId = 10;
         private readonly Customer anyCustomer = new Customer();
         private const string notValidLastname = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         private const string anyName = "anyName";
@@ -33,6 +36,10 @@ namespace DataAccessLayerTest
         public void TestFixtureSetup()
         {
             DatabaseFixtureSetUp();
+
+            _sessionManager = new NHibernateSessionManager();
+
+            
         }
 
         [FixtureTearDown]
@@ -45,8 +52,10 @@ namespace DataAccessLayerTest
         public void Setup()
         {
             DatabaseSetUp();
-            provider = new NHibernateDataProvider();
 
+            _session = _sessionManager.GetSession();
+
+            _provider = new NHibernateDataProvider(_session);
         }
 
         [TearDown]
@@ -61,13 +70,12 @@ namespace DataAccessLayerTest
             SaveTestDatabase();
         }
 
-
         [Test]
         public void CanGetCustomerId()
         {
             ;
 
-            var actual = provider.GetCustomerById(existingCustomerId);
+            var actual = _provider.GetCustomerById(existingCustomerId);
 
             Assert.AreEqual(existingCustomerId, actual.Id);
 
@@ -76,19 +84,33 @@ namespace DataAccessLayerTest
         [Test]
         public void ReturnsNullIfItdoesNotFindACustomer()
         {
-            var actual = provider.GetCustomerById(invalidCustomerId);
+            var actual = _provider.GetCustomerById(invalidCustomerId);
 
             Assert.AreEqual(null, actual);
         }
 
+        [Test]
+        public void CanGetOrdersByJoiningCustomersAndOrdersAndDirtyLazyLoading()
+        {
+            var result = _provider.GetOrdersByJoiningCustomersAndOrderByCustomerAndDate("Lucas", DateTime.Parse("1-1-1900"));
+            Assert.That(result.Count,Is.GreaterThan(10));
+            Assert.That(result.Select(o => o.Customer.Firstname).First(), Is.EqualTo("Lucas"));
+        }
 
+        [Test]
+        public void CanGetCustomersByJoiningCustomersAndOrders()
+        {
+            var result = _provider.GetCustomersByJoiningCustomersAndOrderByCustomerAndDate("Lucas", DateTime.Parse("1-1-1975"));
+            Assert.That(result.Select(s => s.Firstname).First(),Is.EqualTo("Lucas"));
+        }
         [Test]
         public void CanGetCustomersByFirsname()
         {
-            var customers = provider.GetCustomersByFirstname("Juan");
+            var customers = _provider.GetCustomersByFirstname("Juan");
 
             foreach (var customer in customers)
             {
+
                 Assert.AreEqual(customer.Firstname, customerFirstname);
             }
 
@@ -99,7 +121,7 @@ namespace DataAccessLayerTest
         public void CanGetCustomersByFirsnameWithParameters()
         {
 
-            var customers = provider.GetCustomerByFirstnameWithParameters(customerFirstname);
+            var customers = _provider.GetCustomerByFirstnameWithParameters(customerFirstname);
 
             foreach (var customer in customers)
             {
@@ -114,7 +136,7 @@ namespace DataAccessLayerTest
         public void CanGetCustomersByFirsnameAndLastName()
         {
 
-            var customers = provider.GetCustomerByFirstnameAndLastname(customerFirstname, customerLastname);
+            var customers = _provider.GetCustomerByFirstnameAndLastname(customerFirstname, customerLastname);
 
             foreach (var customer in customers)
             {
@@ -130,7 +152,7 @@ namespace DataAccessLayerTest
         {
             var id = 5;
             const int minimumNumerOfOccurances = 2;
-            var customers = provider.GetCustomersWithIdGreaterThan(id);
+            var customers = _provider.GetCustomersWithIdGreaterThan(id);
 
             foreach (var customer in customers)
             {
@@ -144,7 +166,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CreteriaAPI_CanGetCustomerByFirstName()
         {
-            var customers = provider.CriteriaAPI_GetCustomerByFirstName("Juan");
+            var customers = _provider.CriteriaAPI_GetCustomerByFirstName("Juan");
 
             foreach (var customer in customers)
             {
@@ -157,7 +179,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CreteriaAPI_CanGetCustomersByFirsnameAndLastName()
         {
-            var customers = provider.CriteriaAPI_GetCustomersByFirstNameAndLastName(customerFirstname, customerLastname);
+            var customers = _provider.CriteriaAPI_GetCustomersByFirstNameAndLastName(customerFirstname, customerLastname);
 
             foreach (var customer in customers)
             {
@@ -173,7 +195,7 @@ namespace DataAccessLayerTest
         {
             var id = 5;
             const int minimumNumerOfOccurances = 2;
-            var customers = provider.CriteriaAPI_GetCustomersWithIdGreaterThan(id);
+            var customers = _provider.CriteriaAPI_GetCustomersWithIdGreaterThan(id);
 
             foreach (var customer in customers)
             {
@@ -192,7 +214,7 @@ namespace DataAccessLayerTest
 
             var customerSample = new Customer() {Lastname = lastName};
 
-            var customers = provider.QueryByExample_GetCustomerByExample(customerSample);
+            var customers = _provider.QueryByExample_GetCustomerByExample(customerSample);
 
             foreach (var customer in customers)
             {
@@ -211,7 +233,7 @@ namespace DataAccessLayerTest
 
             var customerSample = new Customer() {Firstname = firstname, Lastname = lastname};
 
-            var customers = provider.QueryByExample_GetCustomerByExample(customerSample);
+            var customers = _provider.QueryByExample_GetCustomerByExample(customerSample);
 
             foreach (var customer in customers)
             {
@@ -223,7 +245,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CanGetDistinctFirstNames()
         {
-            IList<string> distinctFirstnames = provider.GetDistinctCustomerFirstNames();
+            IList<string> distinctFirstnames = _provider.GetDistinctCustomerFirstNames();
 
             const int minimumNumberOfDistinctNames = 10;
 
@@ -239,7 +261,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CriteriaAPI_CanGetDistinctFirstNames()
         {
-            IList<string> distinctFirstnames = provider.CriteriaAPI_GetDistinctCustomerFirstNames();
+            IList<string> distinctFirstnames = _provider.CriteriaAPI_GetDistinctCustomerFirstNames();
 
             const int minimumNumberOfDistinctNames = 10;
 
@@ -255,7 +277,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CanRetrieveCustomersOrderBylastname()
         {
-            IList<Customer> customers = provider.GetCustomersOrderByLastname();
+            IList<Customer> customers = _provider.GetCustomersOrderByLastname();
 
             Customer priorCustomer = null;
             foreach (var customer in customers)
@@ -274,7 +296,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CriteriaAPI_CanRetrieveCustomersOrderBylastname()
         {
-            var customers = provider.CriteriaAPI_GetCustomersOrderByLastname();
+            var customers = _provider.CriteriaAPI_GetCustomersOrderByLastname();
 
             Customer priorCustomer = null;
             foreach (var customer in customers)
@@ -312,7 +334,7 @@ namespace DataAccessLayerTest
                                      };
 
 
-            var firstNameCount = provider.GetCustomersFirstnameCount();
+            var firstNameCount = _provider.GetCustomersFirstnameCount();
 
             foreach (var nameCount in expectedCounts)
             {
@@ -333,9 +355,9 @@ namespace DataAccessLayerTest
                                              Firstname = "Jim",
                                              Lastname = "Morrison"
                                          };
-            var customerId = provider.AddCustomer(newCustomerToAdd);
+            var customerId = _provider.AddCustomer(newCustomerToAdd);
 
-            var customerAddedAndRetrieved = provider.GetCustomerById(customerId);
+            var customerAddedAndRetrieved = _provider.GetCustomerById(customerId);
 
             Assert.AreEqual(newCustomerToAdd,customerAddedAndRetrieved);
         }
@@ -343,11 +365,11 @@ namespace DataAccessLayerTest
         [Test]
         public void CanDeleteCustomer()
         {
-            var firstCustomer = provider.GetCustomerById(deletableCustomerId);
+            var firstCustomer = _provider.GetCustomerById(deletableCustomerId);
 
-            provider.DeleteCustomer(firstCustomer);
+            _provider.DeleteCustomer(firstCustomer);
 
-            var customerDeleted = provider.GetCustomerById(deletableCustomerId);
+            var customerDeleted = _provider.GetCustomerById(deletableCustomerId);
 
             Assert.IsNull(customerDeleted);
             Assert.IsNotNull(firstCustomer);
@@ -356,7 +378,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CanGetCustomerById()
         {
-            var customer = provider.GetCustomerById(customerIdWithOrders);
+            var customer = _provider.GetCustomerById(customerIdWithOrders);
 
             Assert.IsNotNull(customer);
 
@@ -367,16 +389,27 @@ namespace DataAccessLayerTest
 
             // If lazy loading is ON, then as soon as the session is deleted (because of "using session"
             // then we wont be able to access the orders.
-            Assert.Throws<LazyInitializationException>(delegate
+            
+            
+            /* No more exception thrown, because the session is not closed, so we can lazy load as much as we want
+             * Assert.Throws<LazyInitializationException>(delegate
                                                            {
                                                                var numberOfOrders = customer.Orders.Count;
+<<<<<<< HEAD
                                                            }); 
+=======
+                                                           });
+             */
+
+            // The session is not destroyed, as such we can retrieve the orders.
+            Assert.That(customer.Orders.Count, Is.GreaterThan(0));
+>>>>>>> ece8ba0303288feb870592351d42baff7aa1a6ad
         }
 
         [Test]
         public void CanGetCustomerByIdNoUsingUsingSession()
         {
-            var customer = provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
+            var customer = _provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
 
             // You can see that here you can browse and inspect the orders in the customer
             // The session is still active
@@ -388,7 +421,7 @@ namespace DataAccessLayerTest
         [Test]
         public void CanGetCustomerAndOrdersByCustomerIdEvenIsNoLazyLoadingAndSessionIsDeleted()
         {
-            var customer = provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
+            var customer = _provider.GetCustomerByIdNoUsingsession(customerIdWithOrders);
             Assert.GreaterThan(customer.Orders.Count, 0);
             Assert.IsNotNull(customer);
             Assert.That(customer.Id, Is.EqualTo(customerIdWithOrders));
@@ -399,13 +432,13 @@ namespace DataAccessLayerTest
         {
             const int specificCustomerId = 8;
 
-            var firstCustomer = provider.GetCustomerById(specificCustomerId);
+            var firstCustomer = _provider.GetCustomerById(specificCustomerId);
 
             var newNameToUpdate = firstCustomer.Firstname + "_newName";
 
-            provider.UpdateCustomerFirstname(specificCustomerId, newNameToUpdate);
+            _provider.UpdateCustomerFirstname(specificCustomerId, newNameToUpdate);
 
-            var updatedName = provider.GetCustomerById(specificCustomerId).Firstname;
+            var updatedName = _provider.GetCustomerById(specificCustomerId).Firstname;
 
             Assert.AreEqual(updatedName, newNameToUpdate);
         }
@@ -413,16 +446,30 @@ namespace DataAccessLayerTest
         [Test]
         public void CanUpdateCustomerLastname()
         {
-            const int specificCustomerId = 6;
+            int specificCustomerId = 6;
+            String updatedLastame;
+            String newLastnameToUpdate;
 
-            var firstCustomer = provider.GetCustomerById(specificCustomerId);
+            using(_session)
+            {
+                var firstCustomer = _provider.GetCustomerById(specificCustomerId);
+                newLastnameToUpdate = firstCustomer.Lastname + "_newName";
+            }
 
-            var newLastnameToUpdate = firstCustomer.Lastname + "_newName";
+            ResetSessionForProvider();
+            using (_session)
+            {
 
-            provider.UpdateCustomerLastname(specificCustomerId, newLastnameToUpdate);
+                _provider.UpdateCustomerLastname(specificCustomerId, newLastnameToUpdate);
+            }
 
-            var updatedLastame = provider.GetCustomerById(specificCustomerId).Lastname;
+            ResetSessionForProvider();
+            using(_session)
+            {
 
+                updatedLastame = _provider.GetCustomerById(specificCustomerId).Lastname;
+            }
+            
             Assert.AreEqual(updatedLastame, newLastnameToUpdate);
         }
 
@@ -430,16 +477,16 @@ namespace DataAccessLayerTest
         public void CanUpdateCustomer()
         {
             const int specificCustomerId = 8;
-            var firstCustomer = provider.GetCustomerById(specificCustomerId);
+            var firstCustomer = _provider.GetCustomerById(specificCustomerId);
             var newName = firstCustomer.Firstname + "_newName";
             var newLastname = firstCustomer.Lastname + "_newLastname";
 
             firstCustomer.Firstname = newName;
             firstCustomer.Lastname = newLastname;
 
-            provider.UpdateCustomer(firstCustomer);
+            _provider.UpdateCustomer(firstCustomer);
 
-            var updateCustomer = provider.GetCustomerById(specificCustomerId);
+            var updateCustomer = _provider.GetCustomerById(specificCustomerId);
 
             Assert.AreEqual(updateCustomer.Firstname, newName);
             Assert.AreEqual(updateCustomer.Lastname, newLastname);
@@ -448,17 +495,17 @@ namespace DataAccessLayerTest
         [Test]
         public void DeleteCustomerCanThrowExceptionOnFail()
         {
-            var undeletableCustomer = provider.GetCustomerById(customerIdWithOrders);
+            var undeletableCustomer = _provider.GetCustomerById(customerIdWithOrders);
 
             Assert.Throws<GenericADOException>(
                 delegate
                     {
-                        provider.DeleteCustomer(undeletableCustomer);
+                        _provider.DeleteCustomer(undeletableCustomer);
                     });
 
             // Sames as above with lambda
             Assert.Throws<GenericADOException>(
-                () => provider.DeleteCustomer(undeletableCustomer));
+                () => _provider.DeleteCustomer(undeletableCustomer));
 
 
         }
@@ -466,17 +513,40 @@ namespace DataAccessLayerTest
         [Test]
         public void DeleteCustomerWithTransactionCanThrowExceptionAndRollBack()
         {
-            var undeletableCustomer = provider.GetCustomerById(customerIdWithOrders);
-            var deletableCustomer = provider.GetCustomerById(deletableCustomerId);
+            Customer undeletableCustomer;
+            Customer deletableCustomer;
+            Customer deletableCustomerRecoverd;
 
-            Assert.Throws<GenericADOException>(delegate
-                              {
-                                  provider.DeleteCustomerWithTransactionCanRollBack(undeletableCustomer,
-                                                                                    deletableCustomer);
-                              });
+            using (_session)
+            {
+                undeletableCustomer = _provider.GetCustomerById(customerIdWithOrders);
+            }
             
+            ResetSessionForProvider();
+            using (_session)
+            {
+                deletableCustomer = _provider.GetCustomerById(deletableCustomerId);
+            }
 
-            var deletableCustomerRecoverd = provider.GetCustomerById(deletableCustomerId);
+
+            ResetSessionForProvider();
+            using (_session)
+            {
+
+
+                Assert.Throws<GenericADOException>(delegate
+                                                       {
+                                                           _provider.DeleteCustomerWithTransactionCanRollBack(
+                                                               undeletableCustomer,
+                                                               deletableCustomer);
+                                                       });
+            }
+            
+            ResetSessionForProvider();
+            using (_session)
+            {
+                deletableCustomerRecoverd = _provider.GetCustomerById(deletableCustomerId);
+            }
 
             Assert.That(deletableCustomerRecoverd.Id, Is.EqualTo(deletableCustomerId));
         }
@@ -525,7 +595,7 @@ namespace DataAccessLayerTest
             var mockSession = new MockSession(mockTransaction);
             var mockSessionFactory = new MockSessionFactory(mockSession);
 
-            return new NHibernateDataProvider(mockSessionFactory);
+            return new NHibernateDataProvider(mockSession);
         }
 
         [Test]
@@ -860,12 +930,12 @@ namespace DataAccessLayerTest
         [Test]
         public void UpdateCustomerWithExtraLongNameWillThrowExceptionAnfFail()
         {
-            var customer = provider.GetCustomerById(existingCustomerId);
+            var customer = _provider.GetCustomerById(existingCustomerId);
             customer.Firstname = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
 
             Assert.Throws<HibernateException>(delegate
                                                              {
-                                                                 provider.UpdateCustomer(customer);
+                                                                 _provider.UpdateCustomer(customer);
                                                              });
         }
 
@@ -873,7 +943,7 @@ namespace DataAccessLayerTest
         public void SaveOrUpdateCustomersWorks()
         {
             const string name = "Juan";
-            var juans = provider.GetCustomersByFirstname(name);
+            var juans = _provider.GetCustomersByFirstname(name);
             const string newLastName = "deTomates";
 
             foreach (var juan in juans)
@@ -887,8 +957,8 @@ namespace DataAccessLayerTest
             juans.Add(newJuan_2);
 
             var numberOfJuansAtTheBeginning = juans.Count;
-            provider.SaveOrUpdateCustomers(juans);
-            var numberOfJuansAfterUpdatingAndSaving = provider.GetCustomerByFirstnameAndLastname(name, newLastName).Count;
+            _provider.SaveOrUpdateCustomers(juans);
+            var numberOfJuansAfterUpdatingAndSaving = _provider.GetCustomerByFirstnameAndLastname(name, newLastName).Count;
 
             Assert.AreEqual(numberOfJuansAtTheBeginning,numberOfJuansAfterUpdatingAndSaving);
         }
@@ -908,8 +978,8 @@ namespace DataAccessLayerTest
 
             }
 
-            provider.SaveOrUpdateCustomers(sameNameLastNameCustomers);
-            var numberOfCustomersInserteInDB = provider.GetCustomerByFirstnameAndLastname(name, lastname).Count;
+            _provider.SaveOrUpdateCustomers(sameNameLastNameCustomers);
+            var numberOfCustomersInserteInDB = _provider.GetCustomerByFirstnameAndLastname(name, lastname).Count;
 
             Assert.AreEqual(numberOfCustomersInserteInDB, numberOfCustomersAdded);
         }
@@ -918,7 +988,13 @@ namespace DataAccessLayerTest
         public void SaveOrUpdateCustomersWorksRollsBackIfExcepionIsThrown()
         {
             const string name = "Juan";
-            var juans = provider.GetCustomersByFirstname(name);
+            IList<Customer> juans;
+            using(_session)
+            {
+                juans = _provider.GetCustomersByFirstname(name);
+            }
+            ResetSessionForProvider();
+            
             const string newLastName = "deTomates";
 
             foreach (var juan in juans)
@@ -939,17 +1015,22 @@ namespace DataAccessLayerTest
             juans.Add(newJuan_Invalid);
 
             var HibernateException_was_thrown = false;
-            try
+
+            using (_session)
             {
-                provider.SaveOrUpdateCustomers(juans);
+                try
+                {
+                    _provider.SaveOrUpdateCustomers(juans);
+                }
+                catch (HibernateException)
+                {
+                    HibernateException_was_thrown = true;
+                }
             }
-            catch (HibernateException)
-            {
-                HibernateException_was_thrown = true;
-            }
+            ResetSessionForProvider();
 
             var numberOfJuansAfterUpdatingAndSaving =
-                provider.GetCustomerByFirstnameAndLastname(name, newLastName).Count;
+                _provider.GetCustomerByFirstnameAndLastname(name, newLastName).Count;
 
             const int zeroAsAResultOfNotBeingExecuted = 0;
 
@@ -962,16 +1043,36 @@ namespace DataAccessLayerTest
         // the exception and act as you wish.
         public void CanThrowExceptionONConcurrencyViolationUpdate_OptimisticConcurrency()
         {
-            var customer_id_1 = provider.GetCustomerById(existingCustomerId);
-            var same_customer_id_1 = provider.GetCustomerById(existingCustomerId);
-            customer_id_1.Firstname = "First Change";
-            same_customer_id_1.Firstname = "Second Change";
+            Customer customer_id_1;
+            using (_session)
+            {
+                customer_id_1 = _provider.GetCustomerById(existingCustomerId);
+                customer_id_1.Firstname = "First Change";
+            }
+            
 
-            provider.UpdateCustomer(customer_id_1);
-            Assert.Throws<StaleObjectStateException>(delegate
-                                                         {
-                                                             provider.UpdateCustomer(same_customer_id_1);
-                                                         });
+            Customer same_customer_id_1;
+            ResetSessionForProvider();
+            using (_session)
+            {
+                same_customer_id_1 = _provider.GetCustomerById(existingCustomerId);
+                same_customer_id_1.Firstname = "Second Change";
+            }
+
+            ResetSessionForProvider();
+            using (_session)
+            {
+                _provider.UpdateCustomer(customer_id_1);
+            }
+
+            ResetSessionForProvider();
+            using (_session)
+            {
+                Assert.Throws<StaleObjectStateException>(delegate
+                                                             {
+                                                                 _provider.UpdateCustomer(same_customer_id_1);
+                                                             });
+            }
 
         }
 
@@ -980,19 +1081,123 @@ namespace DataAccessLayerTest
         // the exception and act as you wish.
         public void CanThhrowExceptionONConcurrencyViolationDelete_OptimisticConcurrency()
         {
-            var customer_id_1 = provider.GetCustomerById(deletableCustomerId);
-            var same_customer_id_1 = provider.GetCustomerById(deletableCustomerId);
+            Customer customer_id_1;
+            Customer same_customer_id_1;
+
+            using(_session)
+            {
+                customer_id_1 = _provider.GetCustomerById(deletableCustomerId);
+            }
             customer_id_1.Firstname = "First Change";
+
+            ResetSessionForProvider();
+
+            using (_session)
+            {
+                same_customer_id_1 = _provider.GetCustomerById(deletableCustomerId);
+            }
             same_customer_id_1.Firstname = "Second Change";
 
-            provider.DeleteCustomer(customer_id_1);
-            Assert.Throws<StaleObjectStateException>(delegate
+            ResetSessionForProvider();
+
+            using (_session)
             {
-                provider.DeleteCustomer(same_customer_id_1);
-            });
+                _provider.DeleteCustomer(customer_id_1);
+            }
+
+            ResetSessionForProvider();
+
+            using (_session)
+            {
+                Assert.Throws<StaleObjectStateException>(delegate
+                                                             {
+
+                                                                 _provider.DeleteCustomer(same_customer_id_1);
+
+                                                             });
+            }
 
         }
 
+        private void ResetSessionForProvider()
+        {
+            _session = _sessionManager.GetSession();
+            _provider.Session = _session;
+        }
 
+        [Test]
+        public void CanGetDistinctCustomersWithOrdersSince()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.GetDistinctCustomersWithOrdersSince(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Assering we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count( c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CriteriaAPI_CanGetDistinctCustomersWithOrdersSince()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.CriteriaAPI_GetDistinctCustomersWithOrdersSince(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Asserting we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count(c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CriteriaAPI_GetDistinctCustomersWithOrdersSinceWithProjects()
+        {
+            var orderDateSince = DateTime.Parse("1/1/1950");
+            var customersOrderSince = _provider.CriteriaAPI_GetDistinctCustomersWithOrdersSinceWithProjects(orderDateSince);
+            foreach (var customer in customersOrderSince)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    Assert.That(order.OrderDate, Is.GreaterThan(orderDateSince));
+                }
+            }
+
+            foreach (var customer in customersOrderSince)
+            {
+                // Assering we have unique (single) customers
+                Assert.AreEqual(1, customersOrderSince.Count(c => c == customer));
+            }
+        }
+
+        [Test]
+        public void CanGetCustomersWithOrdersThatContainAnSpecificProductID()
+        {
+            const int productId = 3;
+            var customers = _provider.GetCustomersWithORdersHavingProduct(productId).Distinct();
+            foreach (var customer in customers)
+            {
+                foreach (var order in customer.Orders)
+                {
+                    var orderContainsProductId = order.Products.Select(s => s.Id).Contains(productId);
+                    Assert.That(orderContainsProductId, Is.True());
+                }
+            }
+        }
     }
 }

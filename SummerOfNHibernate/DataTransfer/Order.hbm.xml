@@ -2,11 +2,19 @@
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer">
   <!-- ' is the Hibernate character to indicate Order is a keyword, like [] in SQL but for NH. Hibernate should figure out whats the character for each  database.-->
   <class name="DataTransfer.Order, DataTransfer" table="`Order`">
-    <id name="OrderId" column ="OrderId" type="Int32" unsaved-value="0">
+	  
+    <id name="Id" column ="OrderId" type="Int32" unsaved-value="0">
       <generator class="native" />
     </id>
+	  
     <property name="OrderDate" column="OrderDate" type="DateTime" not-null="true"/>
-    <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" />
+	  
+	  <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" />
+	  
+	  <bag name="Products" generic="true" table="OrderProduct" inverse="false">
+		  <key column="`Order`" />
+		  <many-to-many column="Product" class="DataTransfer.Product,DataTransfer" />
+	  </bag>
   </class>
-  
+	
 </hibernate-mapping>

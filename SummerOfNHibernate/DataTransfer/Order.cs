@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DataTransfer
 {
     public class Order
     {
-        private int _orderId;
+        private int _id;
         private DateTime _orderDate;
         private Customer _customer;
+        private IList<Product> _products;
 
-        public virtual int OrderId
+        public virtual int Id
         {
-            get { return _orderId; }
-            set { _orderId = value; }
+            get { return _id; }
+            set { _id = value; }
         }
 
         public virtual DateTime OrderDate
@@ -24,6 +26,12 @@ namespace DataTransfer
         {
             get { return _customer; }
             set { _customer = value; }
+        }
+
+        public virtual IList<Product> Products
+        {
+            get { return _products; }
+            set { _products = value; }
         }
     }
 }
