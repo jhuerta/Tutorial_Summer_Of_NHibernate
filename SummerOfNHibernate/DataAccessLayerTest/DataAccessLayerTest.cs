@@ -370,7 +370,7 @@ namespace DataAccessLayerTest
             Assert.Throws<LazyInitializationException>(delegate
                                                            {
                                                                var numberOfOrders = customer.Orders.Count;
-                                                           });
+                                                           }); 
         }
 
         [Test]
@@ -834,6 +834,23 @@ namespace DataAccessLayerTest
             Assert.Throws<Exception>(delegate
             {
                 mockProvider.GetCustomersFirstnameCount();
+            });
+
+            // Assert
+            Assert.That(mockTransaction.WasRolledBack, Is.True());
+        } 
+
+        [Test]
+        public void GetCustomerAndOrdersByCustomerId_RollsBack_WhenHibernateExceptionIsThrown()
+        {
+            // Arrange
+            var mockTransaction = new MockTransaction();
+            var mockProvider = GetMockProvider(mockTransaction);
+
+            // Act
+            Assert.Throws<Exception>(delegate
+            {
+                mockProvider.GetCustomerAndOrdersByCustomerId(anyCustomerid);
             });
 
             // Assert

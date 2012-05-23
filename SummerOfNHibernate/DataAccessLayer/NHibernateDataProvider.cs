@@ -10,11 +10,9 @@ namespace DataAccessLayer
     public class NHibernateDataProvider
     {
         private readonly ISessionFactory _sessionFactory;
+        private readonly ISession _session;
 
-        public NHibernateDataProvider()
-        {
-            _sessionFactory = GetSessionFactory();
-        }
+        public NHibernateDataProvider() : this(GetSessionFactory()){}
 
         public NHibernateDataProvider(ISessionFactory sessionFactory)
         {
