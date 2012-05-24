@@ -411,15 +411,11 @@ namespace DataAccessLayerTest
              * Assert.Throws<LazyInitializationException>(delegate
                                                            {
                                                                var numberOfOrders = customer.Orders.Count;
-<<<<<<< HEAD
                                                            }); 
-=======
-                                                           });
              */
 
             // The session is not destroyed, as such we can retrieve the orders.
             Assert.That(customer.Orders.Count, Is.GreaterThan(0));
->>>>>>> ece8ba0303288feb870592351d42baff7aa1a6ad
         }
 
         [Test]
