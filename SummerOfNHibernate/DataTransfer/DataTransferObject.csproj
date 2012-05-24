@@ -67,6 +67,8 @@
   <ItemGroup>
     <Compile Include="Customer.cs" />
     <Compile Include="CustomerFirstnameCounter.cs" />
+    <Compile Include="CustomersWithToys.cs" />
+    <Compile Include="Name.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -130,6 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Product.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CustomersWithToys.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

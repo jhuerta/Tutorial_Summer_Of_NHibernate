@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer">
+	<class name="DataTransfer.CustomersWithToys, DataTransfer" table="viewCustomersWithToyProducts" mutable="false">
+		<id name="CustomerId" column="CustomerId" type="Int32">
+			<generator class="native" />
+		</id>
+		<property name="Firstname" column="Firstname" type="string" />
+		<property name="Lastname" column="Lastname" type="string" />
+		<property name="OrderDate" column="OrderDate" type="DateTime" />
+		<property name="OrderId" column="OrderId" type="Int32" />
+	</class>
+</hibernate-mapping>
+	

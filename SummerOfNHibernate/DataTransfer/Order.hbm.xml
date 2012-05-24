@@ -11,7 +11,7 @@
 	  
 	  <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" />
 	  
-	  <bag name="Products" generic="true" table="OrderProduct" inverse="false">
+	  <bag name="Products" generic="true" table="OrderProduct">
 		  <key column="`Order`" />
 		  <many-to-many column="Product" class="DataTransfer.Product,DataTransfer" />
 	  </bag>

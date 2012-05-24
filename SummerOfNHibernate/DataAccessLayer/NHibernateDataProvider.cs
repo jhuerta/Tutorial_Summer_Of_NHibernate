@@ -82,7 +82,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var queryString = string.Format("select c from Customer c where c.Firstname = '{0}'", firstname);
+                    var queryString = string.Format("select c from Customer c where c.Name.Firstname = '{0}'", firstname);
                     var customers = _session.CreateQuery(queryString).List<Customer>();
                     transaction.Commit();
                     return customers;
@@ -101,7 +101,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    const string queryString = "select c from Customer c where c.Firstname=:name";
+                    const string queryString = "select c from Customer c where c.Name.Firstname=:name";
                     var customer = _session.CreateQuery(queryString).SetString("name", firstname).List<Customer>();
                     transaction.Commit();
                     return customer;
@@ -127,8 +127,8 @@ namespace DataAccessLayer
 
                     var justDirtyLazyLoadingCustomerFields = orders.Select(s => new
                                                                  {
-                                                                     s.Customer.Firstname,
-                                                                     s.Customer.Lastname,
+                                                                     s.Customer.Name.Firstname,
+                                                                     s.Customer.Name.Lastname,
                                                                      s.Customer.Id
                                                                  }
                         ).Count();
@@ -168,7 +168,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    const string queryString = "select c from Customer c where c.Firstname=:fName and c.Lastname=:lName";
+                    const string queryString = "select c from Customer c where c.Name.Firstname=:fName and c.Name.Lastname=:lName";
 
                     var customer = _session.CreateQuery(queryString).SetString("fName", firstname).SetString("lName", lastname).List<Customer>();
                     transaction.Commit();
@@ -209,7 +209,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var customer = _session.CreateCriteria(typeof(Customer)).Add(Restrictions.Eq("Firstname", firstname)).List<Customer>();
+                    var customer = _session.CreateCriteria(typeof(Customer)).Add(Restrictions.Eq("Name.Firstname", firstname)).List<Customer>();
                     transaction.Commit();
                     return customer;
                 }
@@ -227,7 +227,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var customers = _session.CreateCriteria(typeof(Customer)).Add(Restrictions.Eq("Firstname", firstname)).Add(Restrictions.Eq("Lastname", lastname)).List<Customer>();
+                    var customers = _session.CreateCriteria(typeof(Customer)).Add(Restrictions.Eq("Name.Firstname", firstname)).Add(Restrictions.Eq("Name.Lastname", lastname)).List<Customer>();
                     transaction.Commit();
                     return customers;
                 }
@@ -281,7 +281,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    const string queryString = "select distinct c.Firstname from Customer c";
+                    const string queryString = "select distinct c.Name.Firstname from Customer c";
                     var customerFirstNames = _session.CreateQuery(queryString)
                         .List<string>();
                     transaction.Commit();
@@ -301,7 +301,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    var customers = _session.CreateCriteria(typeof(Customer)).SetProjection(Projections.Distinct(Projections.Property("Firstname"))).List<string>();
+                    var customers = _session.CreateCriteria(typeof(Customer)).SetProjection(Projections.Distinct(Projections.Property("Name.Firstname"))).List<string>();
                     transaction.Commit();
                     return customers;
                 }
@@ -319,7 +319,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    const string queryString = "select c from Customer c order by c.Lastname";
+                    const string queryString = "select c from Customer c order by c.Name.Lastname";
 
                     var customer = _session.CreateQuery(queryString)
                         .List<Customer>();
@@ -341,7 +341,7 @@ namespace DataAccessLayer
                 try
                 {
                     var customers = _session.CreateCriteria(typeof(Customer))
-                        .AddOrder(new NHibernate.Criterion.Order("Lastname", true))
+                        .AddOrder(new NHibernate.Criterion.Order("Name.Lastname", true))
                         .List<Customer>();
                     transaction.Commit();
                     return customers;
@@ -360,7 +360,7 @@ namespace DataAccessLayer
             {
                 try
                 {
-                    const string queryString = "select new CustomerFirstnameCounter(c.Firstname, count(c.Firstname)) from Customer c group by c.Firstname";
+                    const string queryString = "select new CustomerFirstnameCounter(c.Name.Firstname, count(c.Name.Firstname)) from Customer c group by c.Name.Firstname";
                     var toReturn = _session.CreateQuery(queryString).List<CustomerFirstnameCounter>();
                     transaction.Commit();
                     return toReturn;
@@ -457,7 +457,7 @@ namespace DataAccessLayer
                 try
                 {
                     var currentCustomer = GetCustomerByIdWithinOpenedTransaction(customerId);
-                    currentCustomer.Firstname = firstsname;
+                    currentCustomer.Name.Firstname= firstsname;
 
                     _session.Update(currentCustomer);
                     _session.Flush();
@@ -478,7 +478,7 @@ namespace DataAccessLayer
                 try
                 {
                     var currentCustomer = GetCustomerByIdWithinOpenedTransaction(customerId);
-                    currentCustomer.Lastname = lastname;
+                    currentCustomer.Name.Lastname = lastname;
 
                     _session.Update(currentCustomer);
                     _session.Flush();
@@ -596,8 +596,6 @@ namespace DataAccessLayer
                         .CreateCriteria("Orders")
                         .CreateCriteria("Products")
                         .Add(Expression.Eq("Id", productId)).List<Customer>();
-                    //_session.Flush();
-                    //transaction.Commit();
                     return customers;
                 }
                 catch (HibernateException)
@@ -607,6 +605,26 @@ namespace DataAccessLayer
                 }
             }
         }
+
+        public IList<CustomersWithToys> GetCustomersWithToys(DateTime orderDate)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    return _session.CreateCriteria(typeof (CustomersWithToys))
+                        .Add(Expression.Gt("OrderDate", orderDate))
+                        .List<CustomersWithToys>();
+                }
+                catch (HibernateException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
+
 
     }
 

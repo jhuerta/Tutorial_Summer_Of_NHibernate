@@ -7,7 +7,7 @@
 		<property name="Name" column="Name" type="string" not-null="true" length="50" />
 		<property name="Cost" column="Cost" type="float" not-null="true" />
 
-		<bag name="Orders" generic="true" table="OrderProduct" inverse="true">
+		<bag name="Orders" generic="true" table="OrderProduct">
 			<key column="Product" />
 			<many-to-many column="`Order`" class="DataTransfer.Order,DataTransfer" />
 		</bag>

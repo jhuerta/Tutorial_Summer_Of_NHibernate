@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<hibernate-mapping  xmlns="urn:nhibernate-mapping-2.2"
-                    assembly="DataTransfer" namespace="DataTransfer" >
-
+<hibernate-mapping  xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer" >
   <class name="DataTransfer.Customer,DataTransfer" table="Customer">
     <id name="Id" column="CustomerId" type="Int32" unsaved-value="0">
       <generator class="native"></generator>
     </id>
-    <!-- Not required to specify column if it matches the property name -->
-    <!-- DEFAULT Values for version: column="Version" type="integer" unsaved-value="0"-->
-    <version name="Version" />
-    <property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
-    <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>
+	  <version name="Version" column="Version" type="integer" unsaved-value="0"/>
+    <!--<property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
+    <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>-->
     <!-- Lazy loading is TRUE by default! lazy="false" -->
     <set name="Orders" table="`Order`" generic="true" inverse="true">
       <key column="Customer"/>
       <one-to-many class="DataTransfer.Order,DataTransfer"/>
     </set>
+	  <component name="Name" class="DataTransfer.Name, DataTransfer">
+		  <property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
+		  <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>
+	  </component>
   </class>  
 </hibernate-mapping>
