@@ -5,8 +5,6 @@
       <generator class="native"></generator>
     </id>
 	  <version name="Version" column="Version" type="integer" unsaved-value="0"/>
-    <!--<property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
-    <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>-->
     <!-- Lazy loading is TRUE by default! lazy="false" -->
     <set name="Orders" table="`Order`" generic="true" inverse="true">
       <key column="Customer"/>
