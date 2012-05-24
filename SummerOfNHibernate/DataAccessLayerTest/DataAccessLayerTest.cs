@@ -411,11 +411,15 @@ namespace DataAccessLayerTest
              * Assert.Throws<LazyInitializationException>(delegate
                                                            {
                                                                var numberOfOrders = customer.Orders.Count;
+<<<<<<< HEAD
+                                                           }); 
+=======
                                                            });
              */
 
             // The session is not destroyed, as such we can retrieve the orders.
             Assert.That(customer.Orders.Count, Is.GreaterThan(0));
+>>>>>>> ece8ba0303288feb870592351d42baff7aa1a6ad
         }
 
         [Test]
@@ -919,6 +923,23 @@ namespace DataAccessLayerTest
                                          {
                                              mockProvider.GetCustomersFirstnameCount();
                                          });
+
+            // Assert
+            Assert.That(mockTransaction.WasRolledBack, Is.True());
+        } 
+
+        [Test]
+        public void GetCustomerAndOrdersByCustomerId_RollsBack_WhenHibernateExceptionIsThrown()
+        {
+            // Arrange
+            var mockTransaction = new MockTransaction();
+            var mockProvider = GetMockProvider(mockTransaction);
+
+            // Act
+            Assert.Throws<Exception>(delegate
+            {
+                mockProvider.GetCustomerAndOrdersByCustomerId(anyCustomerid);
+            });
 
             // Assert
             Assert.That(mockTransaction.WasRolledBack, Is.True());
