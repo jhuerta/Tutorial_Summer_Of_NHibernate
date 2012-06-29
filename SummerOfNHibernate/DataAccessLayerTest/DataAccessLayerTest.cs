@@ -5,8 +5,10 @@ using DataTransfer;
 using MbUnit.Framework;
 using System.Linq;
 using NHamcrest.Core;
+using NHibernate.Cfg;
 using NHibernate.Exceptions;
 using NHibernate;
+using NHibernate.Tool.hbm2ddl;
 
 namespace DataAccessLayerTest
 {
@@ -35,15 +37,41 @@ namespace DataAccessLayerTest
         private const string anyCustomerLastName = "anyCustomerLastName";
 
 
+        //[FixtureSetUp]
+        //public void TestFixtureSetup()
+        //{
+        //    DatabaseFixtureSetUp();
+        //    _provider = new DataAccessLayer.NHibernateDataProvider(_session);
+        //}
+
+        //[FixtureTearDown]
+        //public void TestFixtureTearDown()
+        //{
+        //    DatabaseFixtureTearDown();
+        //}
+
+        //[SetUp]
+        //public void Setup()
+        //{
+        //    DatabaseSetUp();
+        //}
+
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //    DatabaseTearDown();
+        //}
+
+        
+
         [FixtureSetUp]
         public void TestFixtureSetup()
         {
             DatabaseFixtureSetUp();
 
             _sessionManager = new NHibernateSessionManager();
-
-
         }
+
 
         [FixtureTearDown]
         public void TestFixtureTearDown()
@@ -64,7 +92,7 @@ namespace DataAccessLayerTest
         [TearDown]
         public void TearDown()
         {
-            DatabaseSetUp();
+            DatabaseTearDown();
         }
 
         //[Test]
@@ -1217,6 +1245,25 @@ namespace DataAccessLayerTest
                 Assert.That(atLeastOneOrderContainsProductId, Is.True());
 
             }
+        }
+
+        [Test]
+        public void CreateDatabase()
+        {
+            Configuration cfg = new Configuration();
+            
+            cfg.Configure();
+
+            SchemaExport schema = new SchemaExport(cfg);
+
+             //schema.Create(true,false);
+            // schema.Drop(true,false);
+
+            const bool justDrop = false;
+            const bool outputToConsole = true;
+            const bool executeAgainstDB = false;
+
+            schema.Execute(outputToConsole, executeAgainstDB, justDrop);
         }
 
         [Test]

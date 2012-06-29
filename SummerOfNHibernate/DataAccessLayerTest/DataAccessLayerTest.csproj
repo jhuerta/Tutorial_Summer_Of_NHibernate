@@ -109,6 +109,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\TestData.xml" />
+    <Content Include="TestData\___TestData.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
