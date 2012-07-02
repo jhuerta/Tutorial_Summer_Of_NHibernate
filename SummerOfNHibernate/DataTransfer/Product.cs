@@ -12,6 +12,7 @@ namespace DataTransfer
         private string _name;
         private float _cost;
         private IList<Order> _orders;
+        private int _version;
 
         public virtual int Id
         {
@@ -29,6 +30,12 @@ namespace DataTransfer
         {
             get { return _cost; }
             set { _cost = value; }
+        }
+
+        public virtual int Version
+        {
+            get { return _version; }
+            set { _version = value; }
         }
 
         public virtual IList<Order> Orders

@@ -26,8 +26,7 @@ namespace DataAccessLayerTest.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=localhost\\sqlexpress;Initial Catalog=SummerOfNHibernateBackUpV3;Integ" +
-            "rated Security=True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=ARSG184\\sqlexpress;Initial Catalog=SoNHB2;Integrated Security=True")]
         public string SummerOfNHibernateConnectionString {
             get {
                 return ((string)(this["SummerOfNHibernateConnectionString"]));

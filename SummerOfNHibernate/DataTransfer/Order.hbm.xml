@@ -6,14 +6,15 @@
     <id name="Id" column ="OrderId" type="Int32" unsaved-value="0">
       <generator class="native" />
     </id>
-	  
+	  <version name="Version" column="Version" type="integer" unsaved-value="0"/>
+	  <!-- VERSION should be right after ID!!!! -->
     <property name="OrderDate" column="OrderDate" type="DateTime" not-null="true"/>
 	  
-	  <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" />
+	  <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" foreign-key="FK_CustomerOrders"/>
 	  
 	  <bag name="Products" generic="true" table="OrderProduct">
-		  <key column="`Order`" />
-		  <many-to-many column="Product" class="DataTransfer.Product,DataTransfer" />
+		  <key column="`Order`" foreign-key="FK_OrderProducts" />
+		  <many-to-many column="Product" class="DataTransfer.Product,DataTransfer" foreign-key="FK_ProductOrders"/>
 	  </bag>
   </class>
 	

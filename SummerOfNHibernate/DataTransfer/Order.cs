@@ -9,13 +9,20 @@ namespace DataTransfer
         private DateTime _orderDate;
         private Customer _customer;
         private IList<Product> _products;
+        private int _version;
+
+        public virtual int Version
+        {
+            get { return _version; }
+            set { _version = value; }
+        }
 
         public virtual int Id
         {
             get { return _id; }
             set { _id = value; }
         }
-
+         
         public virtual DateTime OrderDate
         {
             get { return _orderDate; }

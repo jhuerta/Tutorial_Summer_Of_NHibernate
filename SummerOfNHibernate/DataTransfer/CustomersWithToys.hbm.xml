@@ -9,5 +9,26 @@
 		<property name="OrderDate" column="OrderDate" type="DateTime" />
 		<property name="OrderId" column="OrderId" type="Int32" />
 	</class>
+
+	<database-object>
+		<create>drop table viewCustomersWithToyProducts</create>
+		<drop>drop table viewCustomersWithToyProducts</drop>
+	</database-object>
+	
+	<database-object>
+		<create>
+			CREATE VIEW [dbo].[viewCustomersWithToyProducts] AS
+			SELECT DISTINCT c.CustomerId, c.Firstname, c.Lastname, o.OrderId, o.OrderDate
+			FROM         dbo.Customer AS c INNER JOIN
+			dbo.[Order] AS o ON c.CustomerId = o.Customer INNER JOIN
+			dbo.OrderProduct AS op ON o.OrderId = op.[Order] INNER JOIN
+			dbo.Product AS p ON op.Product = p.ProductId
+			WHERE     (p.Name = 'toys')
+			GROUP BY c.CustomerId, c.Firstname, c.Lastname, o.OrderId, o.OrderDate
+		</create>
+		
+		<drop>drop view viewCustomersWithToyProducts</drop>
+	</database-object>
+	
 </hibernate-mapping>
 	

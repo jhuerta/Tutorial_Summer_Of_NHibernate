@@ -7,12 +7,17 @@
 	  <version name="Version" column="Version" type="integer" unsaved-value="0"/>
     <!-- Lazy loading is TRUE by default! lazy="false" -->
     <set name="Orders" table="`Order`" generic="true" inverse="true">
-      <key column="Customer"/>
+      <key column="Customer" foreign-key="FK_CustomerOrders"/>
       <one-to-many class="DataTransfer.Order,DataTransfer"/>
     </set>
+	  
 	  <component name="Name" class="DataTransfer.Name, DataTransfer">
+		  <!-- <property name="Firstname" column="Firstname" type="string" length="50" not-null="false" unique-key="UC_CustomerName"/> -->
+		  <!-- <property name="Lastname" column="Lastname" type="string" length="50" not-null="false" unique-key="UC_CustomerName"/> -->
+
 		  <property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
 		  <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>
 	  </component>
+	  
   </class>  
 </hibernate-mapping>

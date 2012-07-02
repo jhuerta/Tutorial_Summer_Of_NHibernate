@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using DataAccessLayer;
 using DataTransfer;
@@ -35,34 +36,6 @@ namespace DataAccessLayerTest
         private const string anyName = "anyName";
         private const int anyCustomerid = 1;
         private const string anyCustomerLastName = "anyCustomerLastName";
-
-
-        //[FixtureSetUp]
-        //public void TestFixtureSetup()
-        //{
-        //    DatabaseFixtureSetUp();
-        //    _provider = new DataAccessLayer.NHibernateDataProvider(_session);
-        //}
-
-        //[FixtureTearDown]
-        //public void TestFixtureTearDown()
-        //{
-        //    DatabaseFixtureTearDown();
-        //}
-
-        //[SetUp]
-        //public void Setup()
-        //{
-        //    DatabaseSetUp();
-        //}
-
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    DatabaseTearDown();
-        //}
-
-        
 
         [FixtureSetUp]
         public void TestFixtureSetup()
@@ -1256,12 +1229,13 @@ namespace DataAccessLayerTest
 
             SchemaExport schema = new SchemaExport(cfg);
 
-             //schema.Create(true,false);
-            // schema.Drop(true,false);
 
             const bool justDrop = false;
             const bool outputToConsole = true;
-            const bool executeAgainstDB = false;
+            const bool executeAgainstDB = true;
+
+            schema.Drop(outputToConsole, executeAgainstDB);
+            schema.Create(outputToConsole, executeAgainstDB);
 
             schema.Execute(outputToConsole, executeAgainstDB, justDrop);
         }
