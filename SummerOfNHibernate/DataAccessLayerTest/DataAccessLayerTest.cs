@@ -13,6 +13,50 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace DataAccessLayerTest
 {
+
+    [TestFixture]
+    public class DataAccessLayerTests_CreateDatabase : Microdesk.Utility.UnitTest.DatabaseUnitTestBase
+    {
+        [Test]
+        public void CreateDatabase()
+        {
+            Configuration cfg = new Configuration();
+
+            cfg.Configure();
+
+            SchemaExport schema = new SchemaExport(cfg);
+
+
+            const bool justDrop = false;
+            const bool outputToConsole = true;
+            const bool executeAgainstDB = true;
+
+            schema.Drop(outputToConsole, executeAgainstDB);
+            schema.Create(outputToConsole, executeAgainstDB);
+
+            schema.Execute(outputToConsole, executeAgainstDB, justDrop);
+        }
+
+        [Test]
+        public void DeleteDatabase()
+        {
+            Configuration cfg = new Configuration();
+
+            cfg.Configure();
+
+            SchemaExport schema = new SchemaExport(cfg);
+
+
+            const bool justDrop = true;
+            const bool outputToConsole = true;
+            const bool executeAgainstDB = true;
+
+            schema.Drop(outputToConsole, executeAgainstDB);
+            schema.Create(outputToConsole, executeAgainstDB);
+
+            schema.Execute(outputToConsole, executeAgainstDB, justDrop);
+        }
+    }
     [TestFixture]
     public class DataAccessLayerTests : Microdesk.Utility.UnitTest.DatabaseUnitTestBase
     {
@@ -67,6 +111,8 @@ namespace DataAccessLayerTest
         {
             DatabaseTearDown();
         }
+
+
 
         //[Test]
         public void GetMyTestDataXMLFile()
@@ -1218,26 +1264,6 @@ namespace DataAccessLayerTest
                 Assert.That(atLeastOneOrderContainsProductId, Is.True());
 
             }
-        }
-
-        [Test]
-        public void CreateDatabase()
-        {
-            Configuration cfg = new Configuration();
-            
-            cfg.Configure();
-
-            SchemaExport schema = new SchemaExport(cfg);
-
-
-            const bool justDrop = false;
-            const bool outputToConsole = true;
-            const bool executeAgainstDB = true;
-
-            schema.Drop(outputToConsole, executeAgainstDB);
-            schema.Create(outputToConsole, executeAgainstDB);
-
-            schema.Execute(outputToConsole, executeAgainstDB, justDrop);
         }
 
         [Test]

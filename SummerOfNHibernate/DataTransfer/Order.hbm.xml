@@ -12,7 +12,7 @@
 	  
 	  <many-to-one name="Customer" column="Customer" not-null="true" class="DataTransfer.Customer, DataTransfer" foreign-key="FK_CustomerOrders"/>
 	  
-	  <bag name="Products" generic="true" table="OrderProduct">
+	  <bag name="Products" generic="true" table="OrderProduct" inverse="true" >
 		  <key column="`Order`" foreign-key="FK_OrderProducts" />
 		  <many-to-many column="Product" class="DataTransfer.Product,DataTransfer" foreign-key="FK_ProductOrders"/>
 	  </bag>
