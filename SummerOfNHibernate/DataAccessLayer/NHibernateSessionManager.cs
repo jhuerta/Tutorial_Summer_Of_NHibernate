@@ -16,6 +16,7 @@ namespace DataAccessLayer
         {
             return _sessionFactory.OpenSession();
         }
+
         private static ISessionFactory GetSessionFactory()
         {
 
