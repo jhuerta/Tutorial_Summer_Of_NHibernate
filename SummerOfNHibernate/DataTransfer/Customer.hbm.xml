@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping  xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer" >
   <class name="DataTransfer.Customer,DataTransfer" table="Customer">
-    <id name="Id" column="CustomerId" type="Int32" unsaved-value="0">
-      <generator class="native"></generator>
+    <id name="Id" column ="CustomerId" type="Int32" unsaved-value="0">
+      <generator class="increment" />
     </id>
-	  <version name="Version" column="Version" type="integer" unsaved-value="0"/>
+    <version name="Version" column="Version" type="integer" unsaved-value="0"/>
     <!-- Lazy loading is TRUE by default! lazy="false" -->
     <set name="Orders" table="`Order`" generic="true" inverse="true">
       <key column="Customer" foreign-key="FK_CustomerOrders"/>
@@ -18,6 +18,10 @@
 		  <property name="Firstname" column="Firstname" type="string" length="50" not-null="false"/>
 		  <property name="Lastname" column="Lastname" type="string" length="50" not-null="false"/>
 	  </component>
-	  
+
+    <!-- USING STORED PROCEDURES -->
+      <sql-insert> exec CustomerInsert ?,?,?,?</sql-insert>
+      <sql-update>exec CustomerUpdate ?,?,?,?,?</sql-update>
+      <sql-delete> exec CustomerDelete ?, ?</sql-delete>
   </class>  
 </hibernate-mapping>

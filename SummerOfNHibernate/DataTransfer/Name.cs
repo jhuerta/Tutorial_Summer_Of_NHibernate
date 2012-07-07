@@ -2,6 +2,11 @@
 {
     public class Name
     {
+        public override string ToString()
+        {
+            return _firstname + " " + _lastname;
+        }
+
         private string _firstname;
         private string _lastname;
 

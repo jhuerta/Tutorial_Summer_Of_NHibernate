@@ -11,7 +11,7 @@
       </DataSource>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="Database" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="Database" msprop:Generator_DataSetName="Database" msprop:EnableTableAdapterManager="true">
+  <xs:element name="Database" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="Database" msprop:Generator_UserDSName="Database" msprop:EnableTableAdapterManager="true">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element name="Customer" msprop:Generator_UserTableName="Customer" msprop:Generator_RowDeletedName="CustomerRowDeleted" msprop:Generator_TableClassName="CustomerDataTable" msprop:Generator_RowChangedName="CustomerRowChanged" msprop:Generator_RowClassName="CustomerRow" msprop:Generator_RowChangingName="CustomerRowChanging" msprop:Generator_RowEvArgName="CustomerRowChangeEvent" msprop:Generator_RowEvHandlerName="CustomerRowChangeEventHandler" msprop:Generator_TablePropName="Customer" msprop:Generator_TableVarName="tableCustomer" msprop:Generator_RowDeletingName="CustomerRowDeleting">

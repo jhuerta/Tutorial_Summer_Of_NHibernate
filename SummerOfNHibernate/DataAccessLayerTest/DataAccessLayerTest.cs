@@ -1038,10 +1038,10 @@ namespace DataAccessLayerTest
                 sameNameLastNameCustomers.Add(
                     new Customer { Name = new Name{ Firstname = name, Lastname = lastname } }
                     );
-
             }
 
             _provider.SaveOrUpdateCustomers(sameNameLastNameCustomers);
+
             var numberOfCustomersInserteInDB = _provider.GetCustomerByFirstnameAndLastname(name, lastname).Count;
 
             Assert.AreEqual(numberOfCustomersInserteInDB, numberOfCustomersAdded);
@@ -1263,6 +1263,39 @@ namespace DataAccessLayerTest
                 Assert.That(atLeastOneOrderContainsProductId, Is.True());
 
             }
+        }
+
+        [Test]
+        public void CanAddCustomer()
+        {
+            Customer customer = new Customer() { Name = new Name() { Firstname = "Steve", Lastname = "Bohlen" } };
+
+            int newIdentity = _provider.AddCustomerV2(customer);
+
+            Customer testCustomer = _provider.GetCustomerById(newIdentity);
+
+            Assert.IsNotNull(testCustomer);
+
+        }
+
+
+        [Test]
+        public void CanUpdateCustomer_V2()
+        {
+            Customer customer = _provider.GetCustomerById(existingCustomerId);
+
+            string originalFirstname = customer.Name.Firstname;
+
+            string newFirstname = string.Concat(originalFirstname, "SUFFIX");
+
+            customer.Name.Firstname = newFirstname;
+
+            _provider.UpdateCustomer(customer);
+
+            Customer testCustomer = _provider.GetCustomerById(existingCustomerId);
+
+            Assert.AreEqual(newFirstname, testCustomer.Name.Firstname);
+
         }
 
         [Test]

@@ -128,7 +128,7 @@ namespace DataAccessLayer
                                                                  {
                                                                      s.Customer.Name.Firstname,
                                                                      s.Customer.Name.Lastname,
-                                                                     s.Customer.Id
+                                                                     Id = s.Customer.Id
                                                                  }
                         ).Count();
 
@@ -372,24 +372,7 @@ namespace DataAccessLayer
             }
         }
 
-        public int AddCustomer(Customer customer)
-        {
-            using (var trasaction = _session.BeginTransaction())
-            {
-                try
-                {
-                    var id = _session.Save(customer);
-                    _session.Flush();
-                    trasaction.Commit();
-                    return (int)id;
-                }
-                catch (HibernateException)
-                {
-                    trasaction.Rollback();
-                    throw;
-                }
-            }
-        }
+
 
         public void DeleteCustomer(Customer customer)
         {
@@ -509,6 +492,25 @@ namespace DataAccessLayer
             }
         }
 
+        public int AddCustomer(Customer customer)
+        {
+            using (var trasaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    var id = _session.Save(customer);
+                    _session.Flush();
+                    trasaction.Commit();
+                    return (int)id;
+                }
+                catch (HibernateException)
+                {
+                    trasaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
         public Customer GetCustomerAndOrdersByCustomerId(int customerId)
         {
             using (var transaction = _session.BeginTransaction())
@@ -623,8 +625,26 @@ namespace DataAccessLayer
             }
         }
 
+        public int AddCustomerV2(Customer customer)
+        {
 
+            using (ITransaction tx = _session.BeginTransaction())
+            {
+                try
+                {
+                    int newId = (int)_session.Save(customer);
+                    _session.Flush();
+                    tx.Commit();
+                    return newId;
+                }
+                catch (NHibernate.HibernateException)
+                {
+                    tx.Rollback();
+                    throw;
+                }
+            }
 
+        }
     }
 
 
