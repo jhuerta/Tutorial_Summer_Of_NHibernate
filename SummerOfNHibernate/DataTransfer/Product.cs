@@ -10,7 +10,7 @@ namespace DataTransfer
     {
         private int _id;
         private string _name;
-        private decimal _cost;
+        private float _cost;
         private IList<Order> _orders;
         private int _version;
 
@@ -26,7 +26,7 @@ namespace DataTransfer
             set { _name = value; }
         }
 
-        public virtual decimal Cost
+        public virtual float Cost
         {
             get { return _cost; }
             set { _cost = value; }
