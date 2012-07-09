@@ -94,6 +94,25 @@ namespace DataAccessLayer
             }
         }
 
+        public IList<PreferredCustomer> GetPreferredCustomersByFirstname(string firstname)
+        {
+            using (var transaction = _session.BeginTransaction())
+            {
+                try
+                {
+                    var queryString = string.Format("select c from PreferredCustomer c where c.Name.Firstname = '{0}'", firstname);
+                    var customers = _session.CreateQuery(queryString).List<PreferredCustomer>();
+                    transaction.Commit();
+                    return customers;
+                }
+                catch (HibernateException)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+
         public IList<Customer> GetCustomerByFirstnameWithParameters(string firstname)
         {
             using (var transaction = _session.BeginTransaction())
@@ -644,6 +663,11 @@ namespace DataAccessLayer
                 }
             }
 
+        }
+
+        public IList<Customer> GetCustomerByArbitraryCriteria(DetachedCriteria criteria)
+        {
+            return criteria.GetExecutableCriteria(_session).List<Customer>();
         }
     }
 

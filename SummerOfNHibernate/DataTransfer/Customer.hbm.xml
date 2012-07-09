@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping  xmlns="urn:nhibernate-mapping-2.2" assembly="DataTransfer" namespace="DataTransfer" >
-  <class name="DataTransfer.Customer,DataTransfer" table="Customer">
+  <!--<class name="DataTransfer.Customer,DataTransfer" table="Customer" discriminator-value="STANDARD">-->
+    <class name="DataTransfer.Customer,DataTransfer" table="Customer" >
     <id name="Id" column ="CustomerId" type="Int32" unsaved-value="0">
-      <generator class="increment" />
+      <generator class="native" />
+      <!--<generator class="increment" />-->
     </id>
+    <!--<discriminator column="CustomerType" type="string" length="50" not-null="true" />-->
     <version name="Version" column="Version" type="integer" unsaved-value="0"/>
     <!-- Lazy loading is TRUE by default! lazy="false" -->
     <set name="Orders" table="`Order`" generic="true" inverse="true">
@@ -20,8 +23,23 @@
 	  </component>
 
     <!-- USING STORED PROCEDURES -->
+    <!--USE THIS WITH INCREMENT GENERATOR CLASS-->
+      <!--
       <sql-insert> exec CustomerInsert ?,?,?,?</sql-insert>
       <sql-update>exec CustomerUpdate ?,?,?,?,?</sql-update>
       <sql-delete> exec CustomerDelete ?, ?</sql-delete>
+      -->
+
+    <!--<subclass name="DataTransfer.PreferredCustomer,DataTransfer" discriminator-value="PREFERRED">
+      <property name="OrderDiscountRate" column="OrderDiscountRate" type="float" not-null="false" />
+      <property name="CustomerSince" column="CustomerSince" type="DateTime" not-null="false" />
+    </subclass>-->
+
+    <joined-subclass name="DataTransfer.PreferredCustomer,DataTransfer" table="PreferredCustomer">
+      <key column="CustomerId" />
+      <property name="OrderDiscountRate" column="OrderDiscountRate" type="float" not-null="true" />
+      <property name="CustomerSince" column="CustomerSince" type="DateTime" not-null="true" />
+    </joined-subclass>
+    
   </class>  
 </hibernate-mapping>

@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GenericDataProvider.cs" />
     <Compile Include="MyInterceptor.cs" />
     <Compile Include="NHibernateDataProvider.cs" />
     <Compile Include="NHibernateSessionManager.cs" />

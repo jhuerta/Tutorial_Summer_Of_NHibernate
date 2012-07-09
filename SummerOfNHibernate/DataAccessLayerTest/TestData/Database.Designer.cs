@@ -25,19 +25,19 @@ namespace DataAccessLayerTest.TestData {
     [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.DataSet")]
     public partial class Database : global::System.Data.DataSet {
         
-        private CustomerDataTable tableCustomer;
+        private PreferredCustomerDataTable tablePreferredCustomer;
         
-        private ProductDataTable tableProduct;
+        private CustomerDataTable tableCustomer;
         
         private OrderDataTable tableOrder;
         
         private OrderProductDataTable tableOrderProduct;
         
+        private global::System.Data.DataRelation relationFK_PreferredCustomer_Customer;
+        
         private global::System.Data.DataRelation relationFK_CustomerOrders;
         
         private global::System.Data.DataRelation relationFK_OrderProducts;
-        
-        private global::System.Data.DataRelation relationFK_ProductOrders;
         
         private global::System.Data.SchemaSerializationMode _schemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
         
@@ -65,11 +65,11 @@ namespace DataAccessLayerTest.TestData {
             if ((this.DetermineSchemaSerializationMode(info, context) == global::System.Data.SchemaSerializationMode.IncludeSchema)) {
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXmlSchema(new global::System.Xml.XmlTextReader(new global::System.IO.StringReader(strSchema)));
+                if ((ds.Tables["PreferredCustomer"] != null)) {
+                    base.Tables.Add(new PreferredCustomerDataTable(ds.Tables["PreferredCustomer"]));
+                }
                 if ((ds.Tables["Customer"] != null)) {
                     base.Tables.Add(new CustomerDataTable(ds.Tables["Customer"]));
-                }
-                if ((ds.Tables["Product"] != null)) {
-                    base.Tables.Add(new ProductDataTable(ds.Tables["Product"]));
                 }
                 if ((ds.Tables["Order"] != null)) {
                     base.Tables.Add(new OrderDataTable(ds.Tables["Order"]));
@@ -98,18 +98,18 @@ namespace DataAccessLayerTest.TestData {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public CustomerDataTable Customer {
+        public PreferredCustomerDataTable PreferredCustomer {
             get {
-                return this.tableCustomer;
+                return this.tablePreferredCustomer;
             }
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.ComponentModel.Browsable(false)]
         [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public ProductDataTable Product {
+        public CustomerDataTable Customer {
             get {
-                return this.tableProduct;
+                return this.tableCustomer;
             }
         }
         
@@ -190,11 +190,11 @@ namespace DataAccessLayerTest.TestData {
                 this.Reset();
                 global::System.Data.DataSet ds = new global::System.Data.DataSet();
                 ds.ReadXml(reader);
+                if ((ds.Tables["PreferredCustomer"] != null)) {
+                    base.Tables.Add(new PreferredCustomerDataTable(ds.Tables["PreferredCustomer"]));
+                }
                 if ((ds.Tables["Customer"] != null)) {
                     base.Tables.Add(new CustomerDataTable(ds.Tables["Customer"]));
-                }
-                if ((ds.Tables["Product"] != null)) {
-                    base.Tables.Add(new ProductDataTable(ds.Tables["Product"]));
                 }
                 if ((ds.Tables["Order"] != null)) {
                     base.Tables.Add(new OrderDataTable(ds.Tables["Order"]));
@@ -232,16 +232,16 @@ namespace DataAccessLayerTest.TestData {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         internal void InitVars(bool initTable) {
+            this.tablePreferredCustomer = ((PreferredCustomerDataTable)(base.Tables["PreferredCustomer"]));
+            if ((initTable == true)) {
+                if ((this.tablePreferredCustomer != null)) {
+                    this.tablePreferredCustomer.InitVars();
+                }
+            }
             this.tableCustomer = ((CustomerDataTable)(base.Tables["Customer"]));
             if ((initTable == true)) {
                 if ((this.tableCustomer != null)) {
                     this.tableCustomer.InitVars();
-                }
-            }
-            this.tableProduct = ((ProductDataTable)(base.Tables["Product"]));
-            if ((initTable == true)) {
-                if ((this.tableProduct != null)) {
-                    this.tableProduct.InitVars();
                 }
             }
             this.tableOrder = ((OrderDataTable)(base.Tables["Order"]));
@@ -256,9 +256,9 @@ namespace DataAccessLayerTest.TestData {
                     this.tableOrderProduct.InitVars();
                 }
             }
+            this.relationFK_PreferredCustomer_Customer = this.Relations["FK_PreferredCustomer_Customer"];
             this.relationFK_CustomerOrders = this.Relations["FK_CustomerOrders"];
             this.relationFK_OrderProducts = this.Relations["FK_OrderProducts"];
-            this.relationFK_ProductOrders = this.Relations["FK_ProductOrders"];
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -268,14 +268,18 @@ namespace DataAccessLayerTest.TestData {
             this.Namespace = "http://tempuri.org/Database.xsd";
             this.EnforceConstraints = true;
             this.SchemaSerializationMode = global::System.Data.SchemaSerializationMode.IncludeSchema;
+            this.tablePreferredCustomer = new PreferredCustomerDataTable();
+            base.Tables.Add(this.tablePreferredCustomer);
             this.tableCustomer = new CustomerDataTable();
             base.Tables.Add(this.tableCustomer);
-            this.tableProduct = new ProductDataTable();
-            base.Tables.Add(this.tableProduct);
             this.tableOrder = new OrderDataTable();
             base.Tables.Add(this.tableOrder);
             this.tableOrderProduct = new OrderProductDataTable();
             base.Tables.Add(this.tableOrderProduct);
+            this.relationFK_PreferredCustomer_Customer = new global::System.Data.DataRelation("FK_PreferredCustomer_Customer", new global::System.Data.DataColumn[] {
+                        this.tableCustomer.CustomerIdColumn}, new global::System.Data.DataColumn[] {
+                        this.tablePreferredCustomer.CustomerIdColumn}, false);
+            this.Relations.Add(this.relationFK_PreferredCustomer_Customer);
             this.relationFK_CustomerOrders = new global::System.Data.DataRelation("FK_CustomerOrders", new global::System.Data.DataColumn[] {
                         this.tableCustomer.CustomerIdColumn}, new global::System.Data.DataColumn[] {
                         this.tableOrder.CustomerColumn}, false);
@@ -284,19 +288,15 @@ namespace DataAccessLayerTest.TestData {
                         this.tableOrder.OrderIdColumn}, new global::System.Data.DataColumn[] {
                         this.tableOrderProduct.OrderColumn}, false);
             this.Relations.Add(this.relationFK_OrderProducts);
-            this.relationFK_ProductOrders = new global::System.Data.DataRelation("FK_ProductOrders", new global::System.Data.DataColumn[] {
-                        this.tableProduct.ProductIdColumn}, new global::System.Data.DataColumn[] {
-                        this.tableOrderProduct.ProductColumn}, false);
-            this.Relations.Add(this.relationFK_ProductOrders);
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        private bool ShouldSerializeCustomer() {
+        private bool ShouldSerializePreferredCustomer() {
             return false;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        private bool ShouldSerializeProduct() {
+        private bool ShouldSerializeCustomer() {
             return false;
         }
         
@@ -363,13 +363,275 @@ namespace DataAccessLayerTest.TestData {
             return type;
         }
         
-        public delegate void CustomerRowChangeEventHandler(object sender, CustomerRowChangeEvent e);
+        public delegate void PreferredCustomerRowChangeEventHandler(object sender, PreferredCustomerRowChangeEvent e);
         
-        public delegate void ProductRowChangeEventHandler(object sender, ProductRowChangeEvent e);
+        public delegate void CustomerRowChangeEventHandler(object sender, CustomerRowChangeEvent e);
         
         public delegate void OrderRowChangeEventHandler(object sender, OrderRowChangeEvent e);
         
         public delegate void OrderProductRowChangeEventHandler(object sender, OrderProductRowChangeEvent e);
+        
+        /// <summary>
+        ///Represents the strongly named DataTable class.
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        [global::System.Serializable()]
+        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
+        public partial class PreferredCustomerDataTable : global::System.Data.TypedTableBase<PreferredCustomerRow> {
+            
+            private global::System.Data.DataColumn columnCustomerId;
+            
+            private global::System.Data.DataColumn columnCustomerSince;
+            
+            private global::System.Data.DataColumn columnOrderDiscountRate;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerDataTable() {
+                this.TableName = "PreferredCustomer";
+                this.BeginInit();
+                this.InitClass();
+                this.EndInit();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal PreferredCustomerDataTable(global::System.Data.DataTable table) {
+                this.TableName = table.TableName;
+                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
+                    this.CaseSensitive = table.CaseSensitive;
+                }
+                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
+                    this.Locale = table.Locale;
+                }
+                if ((table.Namespace != table.DataSet.Namespace)) {
+                    this.Namespace = table.Namespace;
+                }
+                this.Prefix = table.Prefix;
+                this.MinimumCapacity = table.MinimumCapacity;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected PreferredCustomerDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
+                    base(info, context) {
+                this.InitVars();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn CustomerIdColumn {
+                get {
+                    return this.columnCustomerId;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn CustomerSinceColumn {
+                get {
+                    return this.columnCustomerSince;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn OrderDiscountRateColumn {
+                get {
+                    return this.columnOrderDiscountRate;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.ComponentModel.Browsable(false)]
+            public int Count {
+                get {
+                    return this.Rows.Count;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow this[int index] {
+                get {
+                    return ((PreferredCustomerRow)(this.Rows[index]));
+                }
+            }
+            
+            public event PreferredCustomerRowChangeEventHandler PreferredCustomerRowChanging;
+            
+            public event PreferredCustomerRowChangeEventHandler PreferredCustomerRowChanged;
+            
+            public event PreferredCustomerRowChangeEventHandler PreferredCustomerRowDeleting;
+            
+            public event PreferredCustomerRowChangeEventHandler PreferredCustomerRowDeleted;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void AddPreferredCustomerRow(PreferredCustomerRow row) {
+                this.Rows.Add(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow AddPreferredCustomerRow(CustomerRow parentCustomerRowByFK_PreferredCustomer_Customer, System.DateTime CustomerSince, double OrderDiscountRate) {
+                PreferredCustomerRow rowPreferredCustomerRow = ((PreferredCustomerRow)(this.NewRow()));
+                object[] columnValuesArray = new object[] {
+                        null,
+                        CustomerSince,
+                        OrderDiscountRate};
+                if ((parentCustomerRowByFK_PreferredCustomer_Customer != null)) {
+                    columnValuesArray[0] = parentCustomerRowByFK_PreferredCustomer_Customer[0];
+                }
+                rowPreferredCustomerRow.ItemArray = columnValuesArray;
+                this.Rows.Add(rowPreferredCustomerRow);
+                return rowPreferredCustomerRow;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow FindByCustomerId(int CustomerId) {
+                return ((PreferredCustomerRow)(this.Rows.Find(new object[] {
+                            CustomerId})));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public override global::System.Data.DataTable Clone() {
+                PreferredCustomerDataTable cln = ((PreferredCustomerDataTable)(base.Clone()));
+                cln.InitVars();
+                return cln;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Data.DataTable CreateInstance() {
+                return new PreferredCustomerDataTable();
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal void InitVars() {
+                this.columnCustomerId = base.Columns["CustomerId"];
+                this.columnCustomerSince = base.Columns["CustomerSince"];
+                this.columnOrderDiscountRate = base.Columns["OrderDiscountRate"];
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            private void InitClass() {
+                this.columnCustomerId = new global::System.Data.DataColumn("CustomerId", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCustomerId);
+                this.columnCustomerSince = new global::System.Data.DataColumn("CustomerSince", typeof(global::System.DateTime), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCustomerSince);
+                this.columnOrderDiscountRate = new global::System.Data.DataColumn("OrderDiscountRate", typeof(double), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnOrderDiscountRate);
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
+                                this.columnCustomerId}, true));
+                this.columnCustomerId.AllowDBNull = false;
+                this.columnCustomerId.Unique = true;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow NewPreferredCustomerRow() {
+                return ((PreferredCustomerRow)(this.NewRow()));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
+                return new PreferredCustomerRow(builder);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override global::System.Type GetRowType() {
+                return typeof(PreferredCustomerRow);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanged(e);
+                if ((this.PreferredCustomerRowChanged != null)) {
+                    this.PreferredCustomerRowChanged(this, new PreferredCustomerRowChangeEvent(((PreferredCustomerRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowChanging(e);
+                if ((this.PreferredCustomerRowChanging != null)) {
+                    this.PreferredCustomerRowChanging(this, new PreferredCustomerRowChangeEvent(((PreferredCustomerRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleted(e);
+                if ((this.PreferredCustomerRowDeleted != null)) {
+                    this.PreferredCustomerRowDeleted(this, new PreferredCustomerRowChangeEvent(((PreferredCustomerRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
+                base.OnRowDeleting(e);
+                if ((this.PreferredCustomerRowDeleting != null)) {
+                    this.PreferredCustomerRowDeleting(this, new PreferredCustomerRowChangeEvent(((PreferredCustomerRow)(e.Row)), e.Action));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void RemovePreferredCustomerRow(PreferredCustomerRow row) {
+                this.Rows.Remove(row);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
+                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
+                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
+                Database ds = new Database();
+                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
+                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
+                any1.MinOccurs = new decimal(0);
+                any1.MaxOccurs = decimal.MaxValue;
+                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any1);
+                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
+                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
+                any2.MinOccurs = new decimal(1);
+                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
+                sequence.Items.Add(any2);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute1.Name = "namespace";
+                attribute1.FixedValue = ds.Namespace;
+                type.Attributes.Add(attribute1);
+                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
+                attribute2.Name = "tableTypeName";
+                attribute2.FixedValue = "PreferredCustomerDataTable";
+                type.Attributes.Add(attribute2);
+                type.Particle = sequence;
+                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
+                if (xs.Contains(dsSchema.TargetNamespace)) {
+                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
+                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
+                    try {
+                        global::System.Xml.Schema.XmlSchema schema = null;
+                        dsSchema.Write(s1);
+                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
+                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
+                            s2.SetLength(0);
+                            schema.Write(s2);
+                            if ((s1.Length == s2.Length)) {
+                                s1.Position = 0;
+                                s2.Position = 0;
+                                for (; ((s1.Position != s1.Length) 
+                                            && (s1.ReadByte() == s2.ReadByte())); ) {
+                                    ;
+                                }
+                                if ((s1.Position == s1.Length)) {
+                                    return type;
+                                }
+                            }
+                        }
+                    }
+                    finally {
+                        if ((s1 != null)) {
+                            s1.Close();
+                        }
+                        if ((s2 != null)) {
+                            s2.Close();
+                        }
+                    }
+                }
+                xs.Add(dsSchema);
+                return type;
+            }
+        }
         
         /// <summary>
         ///Represents the strongly named DataTable class.
@@ -386,6 +648,12 @@ namespace DataAccessLayerTest.TestData {
             private global::System.Data.DataColumn columnFirstname;
             
             private global::System.Data.DataColumn columnLastname;
+            
+            private global::System.Data.DataColumn columnCustomerSince;
+            
+            private global::System.Data.DataColumn columnOrderDiscountRate;
+            
+            private global::System.Data.DataColumn columnCustomerType;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public CustomerDataTable() {
@@ -446,6 +714,27 @@ namespace DataAccessLayerTest.TestData {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn CustomerSinceColumn {
+                get {
+                    return this.columnCustomerSince;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn OrderDiscountRateColumn {
+                get {
+                    return this.columnOrderDiscountRate;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataColumn CustomerTypeColumn {
+                get {
+                    return this.columnCustomerType;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -474,13 +763,16 @@ namespace DataAccessLayerTest.TestData {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public CustomerRow AddCustomerRow(int Version, string Firstname, string Lastname) {
+            public CustomerRow AddCustomerRow(int Version, string Firstname, string Lastname, System.DateTime CustomerSince, double OrderDiscountRate, string CustomerType) {
                 CustomerRow rowCustomerRow = ((CustomerRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
                         Version,
                         Firstname,
-                        Lastname};
+                        Lastname,
+                        CustomerSince,
+                        OrderDiscountRate,
+                        CustomerType};
                 rowCustomerRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowCustomerRow);
                 return rowCustomerRow;
@@ -510,6 +802,9 @@ namespace DataAccessLayerTest.TestData {
                 this.columnVersion = base.Columns["Version"];
                 this.columnFirstname = base.Columns["Firstname"];
                 this.columnLastname = base.Columns["Lastname"];
+                this.columnCustomerSince = base.Columns["CustomerSince"];
+                this.columnOrderDiscountRate = base.Columns["OrderDiscountRate"];
+                this.columnCustomerType = base.Columns["CustomerType"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -522,6 +817,12 @@ namespace DataAccessLayerTest.TestData {
                 base.Columns.Add(this.columnFirstname);
                 this.columnLastname = new global::System.Data.DataColumn("Lastname", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnLastname);
+                this.columnCustomerSince = new global::System.Data.DataColumn("CustomerSince", typeof(global::System.DateTime), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCustomerSince);
+                this.columnOrderDiscountRate = new global::System.Data.DataColumn("OrderDiscountRate", typeof(double), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnOrderDiscountRate);
+                this.columnCustomerType = new global::System.Data.DataColumn("CustomerType", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnCustomerType);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnCustomerId}, true));
                 this.columnCustomerId.AutoIncrement = true;
@@ -533,6 +834,7 @@ namespace DataAccessLayerTest.TestData {
                 this.columnVersion.AllowDBNull = false;
                 this.columnFirstname.MaxLength = 50;
                 this.columnLastname.MaxLength = 50;
+                this.columnCustomerType.MaxLength = 50;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -610,285 +912,6 @@ namespace DataAccessLayerTest.TestData {
                 global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
                 attribute2.Name = "tableTypeName";
                 attribute2.FixedValue = "CustomerDataTable";
-                type.Attributes.Add(attribute2);
-                type.Particle = sequence;
-                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
-                if (xs.Contains(dsSchema.TargetNamespace)) {
-                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
-                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
-                    try {
-                        global::System.Xml.Schema.XmlSchema schema = null;
-                        dsSchema.Write(s1);
-                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
-                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
-                            s2.SetLength(0);
-                            schema.Write(s2);
-                            if ((s1.Length == s2.Length)) {
-                                s1.Position = 0;
-                                s2.Position = 0;
-                                for (; ((s1.Position != s1.Length) 
-                                            && (s1.ReadByte() == s2.ReadByte())); ) {
-                                    ;
-                                }
-                                if ((s1.Position == s1.Length)) {
-                                    return type;
-                                }
-                            }
-                        }
-                    }
-                    finally {
-                        if ((s1 != null)) {
-                            s1.Close();
-                        }
-                        if ((s2 != null)) {
-                            s2.Close();
-                        }
-                    }
-                }
-                xs.Add(dsSchema);
-                return type;
-            }
-        }
-        
-        /// <summary>
-        ///Represents the strongly named DataTable class.
-        ///</summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
-        [global::System.Serializable()]
-        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class ProductDataTable : global::System.Data.TypedTableBase<ProductRow> {
-            
-            private global::System.Data.DataColumn columnProductId;
-            
-            private global::System.Data.DataColumn columnVersion;
-            
-            private global::System.Data.DataColumn columnName;
-            
-            private global::System.Data.DataColumn columnCost;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductDataTable() {
-                this.TableName = "Product";
-                this.BeginInit();
-                this.InitClass();
-                this.EndInit();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            internal ProductDataTable(global::System.Data.DataTable table) {
-                this.TableName = table.TableName;
-                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
-                    this.CaseSensitive = table.CaseSensitive;
-                }
-                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
-                    this.Locale = table.Locale;
-                }
-                if ((table.Namespace != table.DataSet.Namespace)) {
-                    this.Namespace = table.Namespace;
-                }
-                this.Prefix = table.Prefix;
-                this.MinimumCapacity = table.MinimumCapacity;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected ProductDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
-                    base(info, context) {
-                this.InitVars();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public global::System.Data.DataColumn ProductIdColumn {
-                get {
-                    return this.columnProductId;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public global::System.Data.DataColumn VersionColumn {
-                get {
-                    return this.columnVersion;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public global::System.Data.DataColumn NameColumn {
-                get {
-                    return this.columnName;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public global::System.Data.DataColumn CostColumn {
-                get {
-                    return this.columnCost;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.ComponentModel.Browsable(false)]
-            public int Count {
-                get {
-                    return this.Rows.Count;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow this[int index] {
-                get {
-                    return ((ProductRow)(this.Rows[index]));
-                }
-            }
-            
-            public event ProductRowChangeEventHandler ProductRowChanging;
-            
-            public event ProductRowChangeEventHandler ProductRowChanged;
-            
-            public event ProductRowChangeEventHandler ProductRowDeleting;
-            
-            public event ProductRowChangeEventHandler ProductRowDeleted;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public void AddProductRow(ProductRow row) {
-                this.Rows.Add(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow AddProductRow(int Version, string Name, float Cost) {
-                ProductRow rowProductRow = ((ProductRow)(this.NewRow()));
-                object[] columnValuesArray = new object[] {
-                        null,
-                        Version,
-                        Name,
-                        Cost};
-                rowProductRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowProductRow);
-                return rowProductRow;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow FindByProductId(int ProductId) {
-                return ((ProductRow)(this.Rows.Find(new object[] {
-                            ProductId})));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public override global::System.Data.DataTable Clone() {
-                ProductDataTable cln = ((ProductDataTable)(base.Clone()));
-                cln.InitVars();
-                return cln;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override global::System.Data.DataTable CreateInstance() {
-                return new ProductDataTable();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            internal void InitVars() {
-                this.columnProductId = base.Columns["ProductId"];
-                this.columnVersion = base.Columns["Version"];
-                this.columnName = base.Columns["Name"];
-                this.columnCost = base.Columns["Cost"];
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            private void InitClass() {
-                this.columnProductId = new global::System.Data.DataColumn("ProductId", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnProductId);
-                this.columnVersion = new global::System.Data.DataColumn("Version", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnVersion);
-                this.columnName = new global::System.Data.DataColumn("Name", typeof(string), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnName);
-                this.columnCost = new global::System.Data.DataColumn("Cost", typeof(float), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnCost);
-                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
-                                this.columnProductId}, true));
-                this.columnProductId.AutoIncrement = true;
-                this.columnProductId.AutoIncrementSeed = -1;
-                this.columnProductId.AutoIncrementStep = -1;
-                this.columnProductId.AllowDBNull = false;
-                this.columnProductId.ReadOnly = true;
-                this.columnProductId.Unique = true;
-                this.columnVersion.AllowDBNull = false;
-                this.columnName.AllowDBNull = false;
-                this.columnName.MaxLength = 50;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow NewProductRow() {
-                return ((ProductRow)(this.NewRow()));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new ProductRow(builder);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override global::System.Type GetRowType() {
-                return typeof(ProductRow);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanged(e);
-                if ((this.ProductRowChanged != null)) {
-                    this.ProductRowChanged(this, new ProductRowChangeEvent(((ProductRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanging(e);
-                if ((this.ProductRowChanging != null)) {
-                    this.ProductRowChanging(this, new ProductRowChangeEvent(((ProductRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleted(e);
-                if ((this.ProductRowDeleted != null)) {
-                    this.ProductRowDeleted(this, new ProductRowChangeEvent(((ProductRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleting(e);
-                if ((this.ProductRowDeleting != null)) {
-                    this.ProductRowDeleting(this, new ProductRowChangeEvent(((ProductRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public void RemoveProductRow(ProductRow row) {
-                this.Rows.Remove(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
-                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
-                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                Database ds = new Database();
-                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
-                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
-                any1.MinOccurs = new decimal(0);
-                any1.MaxOccurs = decimal.MaxValue;
-                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any1);
-                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
-                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
-                any2.MinOccurs = new decimal(1);
-                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any2);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute1.Name = "namespace";
-                attribute1.FixedValue = ds.Namespace;
-                type.Attributes.Add(attribute1);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "ProductDataTable";
                 type.Attributes.Add(attribute2);
                 type.Particle = sequence;
                 global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
@@ -1296,16 +1319,13 @@ namespace DataAccessLayerTest.TestData {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public OrderProductRow AddOrderProductRow(OrderRow parentOrderRowByFK_OrderProducts, ProductRow parentProductRowByFK_ProductOrders) {
+            public OrderProductRow AddOrderProductRow(OrderRow parentOrderRowByFK_OrderProducts, int Product) {
                 OrderProductRow rowOrderProductRow = ((OrderProductRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         null,
-                        null};
+                        Product};
                 if ((parentOrderRowByFK_OrderProducts != null)) {
                     columnValuesArray[0] = parentOrderRowByFK_OrderProducts[0];
-                }
-                if ((parentProductRowByFK_ProductOrders != null)) {
-                    columnValuesArray[1] = parentProductRowByFK_ProductOrders[0];
                 }
                 rowOrderProductRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowOrderProductRow);
@@ -1459,6 +1479,91 @@ namespace DataAccessLayerTest.TestData {
         ///Represents strongly named DataRow class.
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        public partial class PreferredCustomerRow : global::System.Data.DataRow {
+            
+            private PreferredCustomerDataTable tablePreferredCustomer;
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            internal PreferredCustomerRow(global::System.Data.DataRowBuilder rb) : 
+                    base(rb) {
+                this.tablePreferredCustomer = ((PreferredCustomerDataTable)(this.Table));
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public int CustomerId {
+                get {
+                    return ((int)(this[this.tablePreferredCustomer.CustomerIdColumn]));
+                }
+                set {
+                    this[this.tablePreferredCustomer.CustomerIdColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public System.DateTime CustomerSince {
+                get {
+                    try {
+                        return ((global::System.DateTime)(this[this.tablePreferredCustomer.CustomerSinceColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CustomerSince\' in table \'PreferredCustomer\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePreferredCustomer.CustomerSinceColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public double OrderDiscountRate {
+                get {
+                    try {
+                        return ((double)(this[this.tablePreferredCustomer.OrderDiscountRateColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'OrderDiscountRate\' in table \'PreferredCustomer\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tablePreferredCustomer.OrderDiscountRateColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public CustomerRow CustomerRow {
+                get {
+                    return ((CustomerRow)(this.GetParentRow(this.Table.ParentRelations["FK_PreferredCustomer_Customer"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_PreferredCustomer_Customer"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsCustomerSinceNull() {
+                return this.IsNull(this.tablePreferredCustomer.CustomerSinceColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetCustomerSinceNull() {
+                this[this.tablePreferredCustomer.CustomerSinceColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsOrderDiscountRateNull() {
+                return this.IsNull(this.tablePreferredCustomer.OrderDiscountRateColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetOrderDiscountRateNull() {
+                this[this.tablePreferredCustomer.OrderDiscountRateColumn] = global::System.Convert.DBNull;
+            }
+        }
+        
+        /// <summary>
+        ///Represents strongly named DataRow class.
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
         public partial class CustomerRow : global::System.Data.DataRow {
             
             private CustomerDataTable tableCustomer;
@@ -1520,6 +1625,51 @@ namespace DataAccessLayerTest.TestData {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public System.DateTime CustomerSince {
+                get {
+                    try {
+                        return ((global::System.DateTime)(this[this.tableCustomer.CustomerSinceColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CustomerSince\' in table \'Customer\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableCustomer.CustomerSinceColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public double OrderDiscountRate {
+                get {
+                    try {
+                        return ((double)(this[this.tableCustomer.OrderDiscountRateColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'OrderDiscountRate\' in table \'Customer\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableCustomer.OrderDiscountRateColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public string CustomerType {
+                get {
+                    try {
+                        return ((string)(this[this.tableCustomer.CustomerTypeColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("The value for column \'CustomerType\' in table \'Customer\' is DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableCustomer.CustomerTypeColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public bool IsFirstnameNull() {
                 return this.IsNull(this.tableCustomer.FirstnameColumn);
             }
@@ -1540,92 +1690,52 @@ namespace DataAccessLayerTest.TestData {
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsCustomerSinceNull() {
+                return this.IsNull(this.tableCustomer.CustomerSinceColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetCustomerSinceNull() {
+                this[this.tableCustomer.CustomerSinceColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsOrderDiscountRateNull() {
+                return this.IsNull(this.tableCustomer.OrderDiscountRateColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetOrderDiscountRateNull() {
+                this[this.tableCustomer.OrderDiscountRateColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public bool IsCustomerTypeNull() {
+                return this.IsNull(this.tableCustomer.CustomerTypeColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public void SetCustomerTypeNull() {
+                this[this.tableCustomer.CustomerTypeColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow[] GetPreferredCustomerRows() {
+                if ((this.Table.ChildRelations["FK_PreferredCustomer_Customer"] == null)) {
+                    return new PreferredCustomerRow[0];
+                }
+                else {
+                    return ((PreferredCustomerRow[])(base.GetChildRows(this.Table.ChildRelations["FK_PreferredCustomer_Customer"])));
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public OrderRow[] GetOrderRows() {
                 if ((this.Table.ChildRelations["FK_CustomerOrders"] == null)) {
                     return new OrderRow[0];
                 }
                 else {
                     return ((OrderRow[])(base.GetChildRows(this.Table.ChildRelations["FK_CustomerOrders"])));
-                }
-            }
-        }
-        
-        /// <summary>
-        ///Represents strongly named DataRow class.
-        ///</summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
-        public partial class ProductRow : global::System.Data.DataRow {
-            
-            private ProductDataTable tableProduct;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            internal ProductRow(global::System.Data.DataRowBuilder rb) : 
-                    base(rb) {
-                this.tableProduct = ((ProductDataTable)(this.Table));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public int ProductId {
-                get {
-                    return ((int)(this[this.tableProduct.ProductIdColumn]));
-                }
-                set {
-                    this[this.tableProduct.ProductIdColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public int Version {
-                get {
-                    return ((int)(this[this.tableProduct.VersionColumn]));
-                }
-                set {
-                    this[this.tableProduct.VersionColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public string Name {
-                get {
-                    return ((string)(this[this.tableProduct.NameColumn]));
-                }
-                set {
-                    this[this.tableProduct.NameColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public float Cost {
-                get {
-                    try {
-                        return ((float)(this[this.tableProduct.CostColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("The value for column \'Cost\' in table \'Product\' is DBNull.", e);
-                    }
-                }
-                set {
-                    this[this.tableProduct.CostColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public bool IsCostNull() {
-                return this.IsNull(this.tableProduct.CostColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public void SetCostNull() {
-                this[this.tableProduct.CostColumn] = global::System.Convert.DBNull;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public OrderProductRow[] GetOrderProductRows() {
-                if ((this.Table.ChildRelations["FK_ProductOrders"] == null)) {
-                    return new OrderProductRow[0];
-                }
-                else {
-                    return ((OrderProductRow[])(base.GetChildRows(this.Table.ChildRelations["FK_ProductOrders"])));
                 }
             }
         }
@@ -1748,14 +1858,35 @@ namespace DataAccessLayerTest.TestData {
                     this.SetParentRow(value, this.Table.ParentRelations["FK_OrderProducts"]);
                 }
             }
+        }
+        
+        /// <summary>
+        ///Row event argument class
+        ///</summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
+        public class PreferredCustomerRowChangeEvent : global::System.EventArgs {
+            
+            private PreferredCustomerRow eventRow;
+            
+            private global::System.Data.DataRowAction eventAction;
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow ProductRow {
+            public PreferredCustomerRowChangeEvent(PreferredCustomerRow row, global::System.Data.DataRowAction action) {
+                this.eventRow = row;
+                this.eventAction = action;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public PreferredCustomerRow Row {
                 get {
-                    return ((ProductRow)(this.GetParentRow(this.Table.ParentRelations["FK_ProductOrders"])));
+                    return this.eventRow;
                 }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_ProductOrders"]);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            public global::System.Data.DataRowAction Action {
+                get {
+                    return this.eventAction;
                 }
             }
         }
@@ -1778,37 +1909,6 @@ namespace DataAccessLayerTest.TestData {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             public CustomerRow Row {
-                get {
-                    return this.eventRow;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public global::System.Data.DataRowAction Action {
-                get {
-                    return this.eventAction;
-                }
-            }
-        }
-        
-        /// <summary>
-        ///Row event argument class
-        ///</summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "2.0.0.0")]
-        public class ProductRowChangeEvent : global::System.EventArgs {
-            
-            private ProductRow eventRow;
-            
-            private global::System.Data.DataRowAction eventAction;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRowChangeEvent(ProductRow row, global::System.Data.DataRowAction action) {
-                this.eventRow = row;
-                this.eventAction = action;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            public ProductRow Row {
                 get {
                     return this.eventRow;
                 }

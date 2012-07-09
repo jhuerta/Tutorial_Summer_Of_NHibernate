@@ -8,8 +8,9 @@ namespace DataTransfer
         //private string _firstname;
         //private string _lastname;
         private int _id;
-        private int _version;
         private Name _name;
+        private int _version;
+
         private ISet<Order> orders;
         
         //public virtual string Firstname

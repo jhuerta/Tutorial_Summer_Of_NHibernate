@@ -6,9 +6,11 @@ using MbUnit.Framework;
 using System.Linq;
 using NHamcrest.Core;
 using NHibernate.Cfg;
+using NHibernate.Criterion;
 using NHibernate.Exceptions;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
+using Order = DataTransfer.Order;
 
 namespace DataAccessLayerTest
 {
@@ -167,6 +169,20 @@ namespace DataAccessLayerTest
             }
 
             Assert.AreEqual(customers.Count, numberOfJuan);
+        }
+
+        [Test]
+        public void CanGetPreferredCustomersByFirstname()
+        {
+            var customers = _provider.GetPreferredCustomersByFirstname("Juan");
+
+            foreach (var customer in customers)
+            {
+
+                Assert.AreEqual(customer.Name.Firstname, customerFirstname);
+            }
+
+            Assert.AreEqual(customers.Count, 2);
         }
 
         [Test]
@@ -1326,5 +1342,193 @@ namespace DataAccessLayerTest
                 Assert.That(customer.Name.Fullname, Is.EqualTo(expectedFullNameFormat));
             }
         }
+
+        [Test]
+        public void CanEvictCustomerFromSession()
+        {
+            var customer = _provider.GetCustomerById(customerIdWithOrders);
+
+            Assert.IsTrue(_session.Contains(customer));
+            
+            _session.Evict(customer);
+
+            Assert.IsFalse(_session.Contains(customer));
+
+        }
+
+        [Test]
+        public void CustomerIsNotAssociatedWithNewSession()
+        {
+            var customer = _provider.GetCustomerById(customerIdWithOrders);
+
+            Assert.IsTrue(_session.Contains(customer));
+
+            ResetSessionForProvider();
+
+            Assert.IsFalse(_session.Contains(customer));
+
+        }
+
+        [Test]
+        public void CustomerCanBeReassociatedWithNewSession()
+        {
+            var customer = _provider.GetCustomerById(customerIdWithOrders);
+
+            Assert.IsTrue(_session.Contains(customer));
+
+            _session.Close();
+
+            ResetSessionForProvider();
+
+            Assert.IsFalse(_session.Contains(customer));
+
+            _provider.UpdateCustomer(customer);
+
+            Assert.IsTrue(_session.Contains(customer));
+        }
+
+        [Test]
+        public void CustomerCanBeReassociatedWithNewSessionAndSetNonDirtyIfNoModifyAvodingUpdate()
+        {
+            var customer = _provider.GetCustomerById(customerIdWithOrders);
+
+            Assert.IsTrue(_session.Contains(customer));
+
+            _session.Close();
+
+            ResetSessionForProvider();
+
+            Assert.IsFalse(_session.Contains(customer));
+
+            _session.Lock(customer,NHibernate.LockMode.None);
+
+            _provider.UpdateCustomer(customer);
+
+            Assert.IsTrue(_session.Contains(customer));
+        }
+
+        [Test]
+        public void CanGetCustomerByFirstnameUsingDetachedCriteria()
+        {
+            var JuanHuertaCustomers =
+                DetachedCriteria.For<Customer>()
+                .Add(Expression.Eq("Name.Firstname", "Juan"))
+                .Add(Expression.Eq("Name.Lastname", "Huerta"));
+
+
+            var customers = JuanHuertaCustomers.GetExecutableCriteria(_session).List<Customer>();
+            
+            var numberOfJuanHuertaCustomers = customers.Where(x => (x.Name.Firstname == "Juan" && x.Name.Lastname == "Huerta")).Count();
+
+            Assert.That(numberOfJuanHuertaCustomers,Is.EqualTo(customers.Count));
+        }
+
+        [Test]
+        public void CanGetCustomerByFirstnameUsingDetachedCriteriaMethod()
+        {
+            var JuanHuertaCustomers =
+                DetachedCriteria.For<Customer>()
+                .Add(Expression.Eq("Name.Firstname", "Juan"))
+                .Add(Expression.Eq("Name.Lastname", "Huerta"));
+
+
+            var customers = _provider.GetCustomerByArbitraryCriteria(JuanHuertaCustomers);
+
+            var numberOfJuanHuertaCustomers = customers.Where(x => (x.Name.Firstname == "Juan" && x.Name.Lastname == "Huerta")).Count();
+
+            Assert.That(numberOfJuanHuertaCustomers, Is.EqualTo(customers.Count));
+        }
+
+        [Test]
+        public void CanGetCustomerByFirstNameUsingGenericDataProvider()
+        {
+            var JuanHuertaCustomers =
+                DetachedCriteria.For<Customer>()
+                    .Add(Expression.Eq("Name.Firstname", "Juan"))
+                    .Add(Expression.Eq("Name.Lastname", "Huerta"));
+
+            var _genericProvider = new GenericDataProvider<Customer>(_session);
+
+
+            var customersBySpecificProvider = _provider.GetCustomerByArbitraryCriteria(JuanHuertaCustomers);
+            var customersByGenericProvider = _genericProvider.Find(JuanHuertaCustomers);
+
+            var numberOfcustomersBySpecificProviderSerialized = customersBySpecificProvider.Count;
+            var numberOfcustomersByGenericProviderSerialized = customersByGenericProvider.Count;
+            
+            Assert.That(numberOfcustomersByGenericProviderSerialized,Is.Not(0));
+            Assert.That(numberOfcustomersByGenericProviderSerialized, Is.EqualTo(numberOfcustomersBySpecificProviderSerialized));
+        }
+
+        [Test]
+        public void CanGetCustomerByFirstNameUsingSuperCustomerClass()
+        {
+            var name = new Name()
+                           {
+                               Firstname = "Juan",
+                               Lastname = "Huerta"
+                           };
+
+            var superCustomerClass = new SuperCustomerClassDataProvider(_session);
+
+            var customersBySuperCustomerClass = superCustomerClass.GetCustomerByName(name);
+            var numberOfJuanFirstnames = customersBySuperCustomerClass.Where(x => x.Name.Firstname == "Juan").Count();
+            var numberOfJuanLastnames = customersBySuperCustomerClass.Where(x => x.Name.Lastname == "Huerta").Count();
+
+            Assert.That(customersBySuperCustomerClass.Count, Is.GreaterThan(0));
+            Assert.That(numberOfJuanFirstnames, Is.EqualTo(numberOfJuanLastnames));
+            Assert.That(numberOfJuanFirstnames, Is.EqualTo(customersBySuperCustomerClass.Count));
+        }
+
+        [Test]
+        public void CanUseGenericDataProviderForCustomer()
+        {
+            var genericCustomerProvider = new GenericDataProvider<Customer>(_session);
+            var specificCustomerProvider = new CustomerDataProvider(_session);
+
+            int customerId = 9;
+            var customerListByGeneric = genericCustomerProvider.GetById(customerId);
+            var customerListBySpecific = specificCustomerProvider.GetCustomerById(customerId);
+
+            Assert.That(customerListBySpecific, Is.EqualTo(customerListByGeneric));
+        }
+
+        [Test]
+        public void CanUseSuperOrderClassToGetOrder()
+        {
+            var superOrderClass = new SuperOrderClassDataProvider(_session);
+            var orderId = 20;
+
+            var order = superOrderClass.GetOrderById(orderId);
+            Assert.That(order.Id,Is.EqualTo(orderId));
+        }
+
+        [Test]
+        public void CanUseGenericDataProviderForProduct()
+        {
+            var genericProductProvider = new GenericDataProvider<Product>(_session);
+
+            var specificProductProvider = new ProductDataProvider(_session);
+
+            int productId = 20;
+            var productListByGeneric = genericProductProvider.GetById(productId);
+            var productListBySpecific = specificProductProvider.GetProductById(productId);
+
+            Assert.That(productListBySpecific, Is.EqualTo(productListByGeneric));
+        }
+
+        [Test]
+        public void CanUseGenericDataProviderForOrder()
+        {
+            var genericOrderProvider = new GenericDataProvider<Order>(_session);
+            var specificOrderProvider = new OrderDataProvider(_session);
+
+            int orderId = 20;
+            var orderListByGeneric = genericOrderProvider.GetById(orderId);
+            var orderListBySpecific = specificOrderProvider.GetOrderById(orderId);
+
+            Assert.That(orderListBySpecific, Is.EqualTo(orderListByGeneric));
+        }
+
     }
 }
