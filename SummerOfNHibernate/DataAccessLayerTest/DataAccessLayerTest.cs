@@ -18,7 +18,7 @@ namespace DataAccessLayerTest
     [TestFixture]
     public class DataAccessLayerTests_CreateDatabase : Microdesk.Utility.UnitTest.DatabaseUnitTestBase
     {
-        [Test]
+        //[Test]
         public void CreateDatabase()
         {
             Configuration cfg = new Configuration();
@@ -38,7 +38,7 @@ namespace DataAccessLayerTest
             schema.Execute(outputToConsole, executeAgainstDB, justDrop);
         }
 
-        [Test]
+        //[Test]
         public void DeleteDatabase()
         {
             Configuration cfg = new Configuration();

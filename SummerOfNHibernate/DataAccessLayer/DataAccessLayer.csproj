@@ -59,6 +59,7 @@
     <Compile Include="NHibernateDataProvider.cs" />
     <Compile Include="NHibernateSessionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StaticSessionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataTransfer\DataTransferObject.csproj">
