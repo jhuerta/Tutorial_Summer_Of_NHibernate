@@ -594,7 +594,7 @@ namespace DataAccessLayer
                     var customers = _session.CreateCriteria(typeof (Customer))
                         .CreateCriteria("Orders")
                         .CreateCriteria("Products")
-                        .Add(Expression.Eq("Id", productId)).List<Customer>();
+                        .Add(Restrictions.Eq("Id", productId)).List<Customer>();
                     return customers;
                 }
                 catch (HibernateException)

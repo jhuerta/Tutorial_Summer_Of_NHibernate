@@ -1220,7 +1220,7 @@ namespace DataAccessLayerTest
             }
         }
 
-        [Test]
+        //[Test]
         public void CreateDatabase()
         {
             Configuration cfg = new Configuration();
