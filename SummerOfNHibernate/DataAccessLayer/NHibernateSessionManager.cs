@@ -14,8 +14,10 @@ namespace DataAccessLayer
 
         public ISession GetSession()
         {
-            return _sessionFactory.OpenSession();
+            //return _sessionFactory.OpenSession();
+            return _sessionFactory.OpenSession(new MyInterceptor());
         }
+
         private static ISessionFactory GetSessionFactory()
         {
 

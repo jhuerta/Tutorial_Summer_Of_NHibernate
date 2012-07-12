@@ -88,9 +88,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="TestData\Database.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
+    <Compile Include="TestData\Database.cs">
       <DependentUpon>Database.xsd</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -117,16 +115,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="TestData\Database.xsc">
-      <DependentUpon>Database.xsd</DependentUpon>
-    </None>
     <None Include="TestData\Database.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>Database.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="TestData\Database.xss">
-      <DependentUpon>Database.xsd</DependentUpon>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

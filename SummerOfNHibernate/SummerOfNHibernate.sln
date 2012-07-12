@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAcce
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayerTest", "DataAccessLayerTest\DataAccessLayerTest.csproj", "{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebFormHarness", "WebFormHarness\WebFormHarness\WebFormHarness.csproj", "{A639D26F-EB78-4C7A-A726-CC15378A7264}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD18A55B-C6F1-4D51-BB5C-96D54AF9B7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A639D26F-EB78-4C7A-A726-CC15378A7264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A639D26F-EB78-4C7A-A726-CC15378A7264}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A639D26F-EB78-4C7A-A726-CC15378A7264}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A639D26F-EB78-4C7A-A726-CC15378A7264}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
